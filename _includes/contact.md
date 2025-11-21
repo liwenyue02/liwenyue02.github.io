@@ -6,5 +6,5 @@
 <br />
 <strong>Office Location:</strong>理科楼D栋
 <br />
-<strong>Email:</strong> <email>zmzhang@cqu.edu.cn</email>
+<strong>Email:</strong> <email>1456309729@qq.com</email>
 <br />

@@ -1,11 +1,12 @@
 main:
 
-  - title: "Contact"
-    url: ./#contact 
-    right: true 
+  # - title: "Contact"
+  #   url: ./#contact 
+  #   right: true 
 
-  - title: "Students"
-    url: ./#students
+  - title: "Awards"
+    url: ./#awards
+    right: true
 
   #- title: "Talks"
   #  url: ./#invited-talks
