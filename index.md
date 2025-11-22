@@ -46,5 +46,3 @@ I am working in [the School of Mathematics and Statistics at the ChongQing Unive
 {% include_relative _includes/articles.md %}
 
 {% include_relative _includes/awards.md %}
-
-{% include_relative _includes/contact.md %}
