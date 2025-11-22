@@ -1,4 +1,4 @@
-<h1 id="Awards"></h1>
+<h1 id="awards"></h1>
 
 <h2 style="margin: 30px 0px 15px;">Awards</h2>
 
@@ -13,10 +13,10 @@
     <a><autocolor>重庆大学三好学生.</autocolor></a>
   
   <li><a style="color:#e74d3c">Major project</a> <a><autocolor>of Chongqing Municipal Bureau of Statistics.</autocolor></a> <strong>(Core member)</strong> </li>
-    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>重大项目.</autocolor></a><strong>（核心成员）</strong></li>
+    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>重大项目.</autocolor></a><strong>（核心成员）</strong>
 
   <li><a style="color:#e74d3c">General project</a> <a><autocolor>of Chongqing Municipal Bureau of Statistics.</autocolor></a> <strong>(Student leader, Core member)</strong> </li>
-    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>一般项目.</autocolor></a><strong>（学生负责人，核心成员）</strong></li>
+    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>一般项目.</autocolor></a><strong>（学生负责人，核心成员）</strong>
   
   <li><a><autocolor>Category A Scholarship.</autocolor></a> <i style="color:#e74d3c">Awarded for two consecutive years</i></li>
     <a><autocolor>硕士A类奖学金.</autocolor></a> <i style="color:#e74d3c">连续两年获得</i>
