@@ -6,6 +6,8 @@ layout: homepage
 
 <h2 style="margin: 60px 0px 10px;">Profile</h2>
 
+我目前在湖北宜化集团的数智部工作，主要负责AI应用开发，
+
 [重庆大学](https://sci.cqu.edu.cn/index.htm)教授、博士生导师，重庆市学术技术带头人，香港大学和墨尔本大学访问学者。目前担任中国工业与应用数学学会理事，中国现场统计研究会风险管理与精算分会常务理事，重庆市统计学会理事等。主要研究兴趣为金融统计、金融数学模型、风险管理与精算学、非参数统计、机器学习等。已经发表SCI或SSCI论文50余篇，且多为第一作者或通讯作者，其中在风险管理与精算学权威杂志IME上发表论文5篇，ASTIN Bulletin上发表论文2篇，SAJ上发表论文9篇。作为项目负责人，主持国家自然基金1项青年基金和2项面上项目，1项教育部博士点基金，2项重庆市自然基金和多个横向课题。
 
 I am working in [the School of Mathematics and Statistics at the ChongQing University](https://sci.cqu.edu.cn/index.htm).I am currently a professor and doctoral supervisor of Chongqing University, a leader in academic technology in Chongqing, and a visiting scholar of University of Hong Kong and University of Melbourne. At present, I am the director of China Society of Industrial and Applied Mathematics, the Executive director of Risk Management and Actuarial Branch of China Field Statistics Research Society, and the director of Chongqing Statistical Society. 
