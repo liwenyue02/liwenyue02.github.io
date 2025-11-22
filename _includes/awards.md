@@ -29,13 +29,13 @@
 <ul>
 
   <li><a style="color:#e74d3c">National Second Prize</a> <a><autocolor>, "Huawei Cup" Mathematical Modeling Competition.</autocolor></a> <strong>(Leader)</strong> </li>
-    <a>华为杯数学建模大赛</a><a  style="color:#e74d3c"><autocolor>国家二等奖.</autocolor></a><strong>（负责人）</strong></li>
+    <a>华为杯数学建模大赛</a><a  style="color:#e74d3c"><autocolor>国家二等奖.</autocolor></a><strong>（负责人）</strong>
 
   <li><a style="color:#e74d3c">Scientific research project</a> <a><autocolor>of Chongqing Municipal Bureau of Statistics.</autocolor></a> <strong>(Student leader, Core member)</strong> </li>
-    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>科研项目.</autocolor></a><strong>（核心成员）</strong></li>
+    <a>重庆市统计局</a><a  style="color:#e74d3c"><autocolor>科研项目.</autocolor></a><strong>（核心成员）</strong>
 
   <li><a><autocolor>Outstanding undergraduate graduation thesis.</autocolor></a></li>
-    <a><autocolor>本科优秀毕业论文.</autocolor></a></li>
+    <a><autocolor>本科优秀毕业论文.</autocolor></a>
   
   <li><a><autocolor>Outstanding undergraduate graduate.</autocolor></a></li>
     <a><autocolor>本科优秀毕业生.</autocolor></a>
@@ -48,13 +48,13 @@
 <ul>
 
   <li><a style="color:#e74d3c">National Second Prize</a> <a><autocolor>, National College Students' Market Research and Analysis Competition.</autocolor></a> <strong>(Leader)</strong> </li>
-    <a>全国大学生市场调查与分析大赛</a><a  style="color:#e74d3c"><autocolor>国家二等奖.</autocolor></a><strong>（负责人）</strong></li>
+    <a>全国大学生市场调查与分析大赛</a><a  style="color:#e74d3c"><autocolor>国家二等奖.</autocolor></a><strong>（负责人）</strong>
 
   <li><a style="color:#e74d3c">Hubei Province College Students' Innovation Training Program.</a> <strong>(Leader)</strong> </li>
-    <a>湖北省大学生创新训练项目.</a><strong>（负责人）</strong></li>
+    <a>湖北省大学生创新训练项目.</a><strong>（负责人）</strong>
 
   <li><a><autocolor>Outstanding undergraduate graduation thesis.</autocolor></a></li>
-    <a><autocolor>本科优秀毕业论文.</autocolor></a></li>
+    <a><autocolor>本科优秀毕业论文.</autocolor></a>
   
   <li><a><autocolor>Outstanding undergraduate graduate.</autocolor></a></li>
     <a><autocolor>本科优秀毕业生.</autocolor></a>
@@ -67,13 +67,13 @@
 <ul>
 
   <li><a style="color:#e74d3c">International Third Prize</a> <a><autocolor>, Mathematical Contest in Modeling in USA.</autocolor></a> <strong>(Leader)</strong> </li>
-    <a>美国大学生数学建模大赛</a><a  style="color:#e74d3c"><autocolor>国际三等奖.</autocolor></a><strong>（负责人）</strong></li>
+    <a>美国大学生数学建模大赛</a><a  style="color:#e74d3c"><autocolor>国际三等奖.</autocolor></a><strong>（负责人）</strong>
 
   <li><a style="color:#e74d3c">Third Prize (Hubei Province)</a> <a><autocolor>, National College Students' Mathematical Modeling Contest.</autocolor></a> <strong>(Leader)</strong> </li>
-    <a>全国大学生数学建模大赛</a><a  style="color:#e74d3c"><autocolor>湖北省三等奖.</autocolor></a><strong>（负责人）</strong></li>
+    <a>全国大学生数学建模大赛</a><a  style="color:#e74d3c"><autocolor>湖北省三等奖.</autocolor></a><strong>（负责人）</strong>
 
   <li><a style="color:#e74d3c">First Prize (Final Round, Translation – Written)</a> <a><autocolor>, Hubei Province Translation Competition.</autocolor></a></li>
-    <a>湖北省翻译大赛</a><a  style="color:#e74d3c"><autocolor>笔译决赛一等奖.</autocolor></a></li>
+    <a>湖北省翻译大赛</a><a  style="color:#e74d3c"><autocolor>笔译决赛一等奖.</autocolor></a>
 
 </ul>
 
