@@ -65,19 +65,11 @@ In academic research, I have participated in <strong>three research projects fun
 - **<strong>网络分析🕸➡︎🧠:</strong>** 主要研究基于图神经网络、知识图谱、LLM的社会网络分析，涵盖预测、关系构建、画像构建等。
 
 ## Working Experience
+- **[2025.07 - 至今]** 湖北宜化集团（中国500强），AI应用开发，正职.
 - **[2024.06 - 2024.09]** 北京猫眼娱乐（美团电影），商业分析，实习生.
-- **[2024.06 - 2024.09]** 北京猫眼娱乐（美团电影），商业分析，实习生.
-
-
-{% include_relative _includes/news.md %}
-
-{% include_relative _includes/publications.md %}
-
-{% include_relative _includes/projects.md %}
-
-{% include_relative _includes/articles.md %}
-
-{% include_relative _includes/awards.md %}
+- **[2023.12 - 2024.02]** 中国科学院 精密测量科学与技术创新研究院，数据分析，实习生.
+- **[2022.06 - 2022.08]** 武汉泰迪智慧科技，数据挖掘，实习生.
+- **[2021.06 - 2021.08]** 深圳DigQuant，量化金融策略，实习生.
 
 
 <!-- ========== JS for switching languages ========== -->
@@ -92,3 +84,14 @@ function showEN() {
   document.getElementById('profile-en').style.display = 'block';
 }
 </script>
+
+
+{% include_relative _includes/news.md %}
+
+{% include_relative _includes/publications.md %}
+
+{% include_relative _includes/projects.md %}
+
+{% include_relative _includes/articles.md %}
+
+{% include_relative _includes/awards.md %}
