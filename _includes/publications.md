@@ -2,8 +2,6 @@
 
 <h2 style="margin: 60px 0px -15px;">Publications 
 <temp style="font-size:15px;">[</temp><a href="https://www-scopus-com-s.atrust.cqu.edu.cn/authid/detail.uri?authorId=35219373500#" target="_blank" style="font-size:15px;">Scopus</a><temp style="font-size:15px;">]</temp>
-<temp style="font-size:15px;">[</temp><a href="https://www.researchgate.net/profile/Zhimin-Zhang-2" target="_blank" style="font-size:15px;">Research Gate-1</a><temp style="font-size:15px;">]</temp>
-<temp style="font-size:15px;">[</temp><a href="https://www.researchgate.net/scientific-contributions/Zhimin-Zhang-2266595476" target="_blank" style="font-size:15px;">Research Gate-2</a><temp style="font-size:15px;">]</temp></h2>
 
 
 <div class="publications">
@@ -59,23 +57,7 @@
         startext.innerHTML=stars;
   });
   </script>
-  <script>
-      $(document).ready(function () {
-          
-          var gsDataBaseUrl = 'https://raw.githubusercontent.com/zzmcqu/zzmcqu.github.io/'
-          
-          $.getJSON(gsDataBaseUrl + "google-scholar-stats/gs_data.json", function (data) {
-              var totalCitation = data['publications']['Uf9GqRsAAAAJ:bEWYMUwI8FkC']['num_citations']
-              document.getElementById('total_citation_mtl').innerHTML = totalCitation;
-              var citationEles = document.getElementsByClassName('show_paper_citations')
-              Array.prototype.forEach.call(citationEles, element => {
-                  var paperId = element.getAttribute('data')
-                  var numCitations = data['publications'][paperId]['num_citations']
-                  element.innerHTML = '| Citations: ' + numCitations;
-              });
-          });
-      })
-  </script>
+
     </div>
   </div>
 </div>
