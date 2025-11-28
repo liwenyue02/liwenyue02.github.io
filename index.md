@@ -27,7 +27,7 @@ layout: homepage
 具备扎实的统计建模与研究能力。
 
 <details style="margin-top: 0;">
-    <summary style="margin-bottom: 0;"><em>除实习和学术之外... </em> </summary>我总是<strong>渴望结识有趣的人😊并通过他们探索我周围世界的新视角</strong>🌟. 
+    <summary style="margin-bottom: 0; color: #1e90ff;"><em>除实习和学术之外... </em> </summary>我总是<strong>渴望结识有趣的人😊并通过他们探索我周围世界的新视角</strong>🌟. 
 
 - 我曾任职于校学生会、研团委，组织策划多次大型校园活动🎤🎭，<strong>成功吸引了上千名学生</strong>参加。
 - 我业余时间爱好羽毛球🏸，健身🏋️，旅行✈️。
