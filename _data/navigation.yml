@@ -1,0 +1,23 @@
+main:
+
+  - title: "Awards"
+    url: ./#awards
+    right: true
+  
+  # - title: "Contact"
+  #   url: ./#contact
+
+  - title: "Articles"
+    url: ./#articles
+    
+  - title: "Projects"
+    url: ./#projects
+
+  - title: "Publications"
+    url: ./#publications
+
+  - title: "News"
+    url: ./#news
+
+  - title: "Profile"
+    url: ./

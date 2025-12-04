@@ -1,0 +1,33 @@
+main:
+
+  - title: Multi-period mean-variance portfolio optimization with capital injections
+    authors: Longyu Shi, Yunyun Wang, Wenyue Li, <strong>Zhimin Zhang <sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong><br>(<sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)
+    conference_short: MCS (JCR Q1;中科院2区)
+    conference: Mathematics and Computers in Simulation.<strong>(MCS)</strong>, 2025.
+    pdf: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
+    HTML: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
+    # image用multi-period injections.png替换
+    image: ./assets/img/multi-period injections.png
+    notes: ADMM、Portfolio optimization
+
+  - title: "Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models"
+    authors: Anonymous Author(s)
+    conference_short: WWW (CCF-A)
+    conference: The ACM Web Conference <strong>(WWW)</strong>, 2026.
+    pdf: https://www.tandfonline.com/doi/epdf/10.1080/03461238.2022.2144432?needAccess=true
+    Tables: https://www.tandfonline.com/doi/figure/10.1080/03461238.2022.2144432?scroll=top&needAccess=true
+    bibtex: https://usercontent.cljtscd.com/scholar.bib?q=info:Zlz-3hl5fUUJ:scholar.google.com/&output=citation&scisdr=ClHYgzVLGAA:AFWwaeYAAAAAZi0kVL3unMrV5isx7HdcgxZ3zsg&scisig=AFWwaeYAAAAAZi0kVNpfVE21eV2hmZwf-2NrVLI&scisf=4&ct=citation&cd=-1&hl=zh-CN
+    # image用watermark LLM.png替换
+    image: ./assets/img/watermark LLM.png
+    notes: Large Language Models、Dynamic Watermarking
+  
+  
+  # 模板 
+  #- title: Prompt-Based Exemplar Super-Compression and Regeneration for Class-Incremental Learning
+  #  authors: Ruxiao Duan, <strong>Yaoyao Liu<sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong>, Jieneng Chen, Adam Kortylewski, Alan Yuille <br>( <sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)
+  #  conference_short: Preprint
+  #  conference: Under review.
+  #  pdf: https://arxiv.org/pdf/2311.18266.pdf
+  #  bibtex: https://dblp.uni-trier.de/rec/journals/corr/abs-2311-18266.html?view=bibtex
+  #  code: https://github.com/KerryDRX/ESCORT
+  #  image: https://img.yliu.me/arxiv_23_2.png

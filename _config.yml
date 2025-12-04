@@ -1,0 +1,65 @@
+# Basic Information 
+title: 
+  - 李文月
+  - Wenyue Li
+position: Graduate Student
+affiliation: ChongQing University
+email: 270201381@qq.com
+
+# Search Engine Optimization (SEO)
+# The following information is used to improve the website traffic from search engines, e.g., Google.
+keywords: minimal light
+description: The Minimal Light is a simple and elegant jekyll theme for academic personal homepage.
+canonical: https://minimal-light-theme.yliu.me/
+
+# Links 
+# If you don't need one of them, you may delete the corresponding line.
+# google_scholar: https://scholar.google.com/citations?user=rNuJQowAAAAJ&hl=zh-CN&oi=ao  # 插入谷歌学术链接
+# cv_link: https://docs.google.com/document/d/1kDCCjJJcMdhKW_YKO6FOchhgqiM1t9SxsgyKqpJKQBM/edit?tab=t.0  # 插入谷歌链接
+github_link: https://github.com/liwenyue02
+# linkedin: https://www.linkedin.com/
+# rednote: https://www.xiaohongshu.com/user/profile/61f27c65000000001000bf55
+# twitter: https://x.com/li_wenyue02
+
+# Images (e.g., your profile picture and your website's favicon) 
+# "favicon" and "favicon_dark" are used for the light and dark modes, respectively. 
+# avator换成我的old_lwy_documents文件夹里的personal avator.jpg
+avatar: ./assets/img/personal avator.jpg
+# favicon换成我的old_lwy_documents文件夹里的web favicon.png
+favicon: ./assets/img/web favicon.png
+# favico_dark换成我的old_lwy_documents文件夹里的web favicon.png
+favicon_dark: ./assets/img/web favicon.png
+
+# Footnote
+# You may use the option to disable the footnote, "Powered by Jekyll and Minimal Light theme."
+enable_footnote: true
+
+# Auto Dark Mode
+# You may use the option to disable the automatic dark theme
+auto_dark_mode: true
+
+# Font
+# You can use this option to choose between Serif or Sans Serif fonts.
+font: "Serif" # or "Sans Serif"
+
+# Custom CSS
+# Add custom CSS files to override default styles
+custom_css:
+  - assets/css/nav.css
+
+# Google Analytics ID
+# Please remove this if you don't use Google Analytics
+# google_analytics: UA-123456789-4
+
+# Use this project as a remote theme for GitHub Pages
+# See the guide here: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/adding-a-theme-to-your-github-pages-site-using-jekyll
+remote_theme: yaoyao-liu/minimal-light
+
+# The following files will be removed from the generated website.
+exclude:
+  - Gemfile
+  - README.md
+  - README_zh_Hans.md
+  - LICENSE
+  - minimal-light.gemspec
+  - html_source_file/
