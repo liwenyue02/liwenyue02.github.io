@@ -10,8 +10,8 @@ main:
   # - title: "Articles"
   #   url: ./#articles
     
-  # - title: "Projects"
-  #   url: ./#projects
+  - title: "Projects"
+    url: ./#projects
 
   - title: "Publications"
     url: ./#publications
@@ -22,3 +22,4 @@ main:
   - title: "Profile"
 
     url: ./
+
