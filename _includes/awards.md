@@ -52,12 +52,6 @@
   <li><a style="color:#e74d3c">Hubei Province College Students' Innovation Training Program.</a> <strong>(Leader)</strong> </li>
     <a><autocolor>湖北省大学生创新训练项目.</autocolor></a><strong>（负责人）</strong>
 
-  <li><a><autocolor>Outstanding undergraduate graduation thesis.</autocolor></a></li>
-    <a><autocolor>本科优秀毕业论文.</autocolor></a>
-  
-  <li><a><autocolor>Outstanding undergraduate graduate.</autocolor></a></li>
-    <a><autocolor>本科优秀毕业生.</autocolor></a>
-
 </ul>
 
 
@@ -76,5 +70,6 @@
 
   <li><a style="color:#e74d3c">First Prize (Final Round, Translation – Written)</a> <a><autocolor>, Hubei Province Translation Competition.</autocolor></a></li>
     <a><autocolor>湖北省翻译大赛</autocolor></a><a  style="color:#e74d3c"><autocolor>笔译决赛一等奖.</autocolor></a>
+
 
 </ul>
