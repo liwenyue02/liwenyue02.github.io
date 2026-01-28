@@ -7,17 +7,18 @@ main:
   # - title: "Contact"
   #   url: ./#contact
 
-  - title: "Articles"
-    url: ./#articles
+  # - title: "Articles"
+  #   url: ./#articles
     
-  - title: "Projects"
-    url: ./#projects
+  # - title: "Projects"
+  #   url: ./#projects
 
   - title: "Publications"
     url: ./#publications
 
-  - title: "News"
-    url: ./#news
+  # - title: "News"
+  #   url: ./#news
 
   - title: "Profile"
+
     url: ./
