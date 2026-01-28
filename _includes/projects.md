@@ -13,7 +13,7 @@
 
 <h4 style="margin:0 10px 0;">科学研究项目</h4>
 <ul>
-<li><strong>①[重庆市统计局 科学研究项目]</strong>科技创新促进实体经济现代化的时空演变范式研究究.(2023.06 - 2023.09)</li>
+<li><strong>[重庆市统计局 科学研究项目]</strong>科技创新促进实体经济现代化的时空演变范式研究.(2023.06 - 2023.09)</li>
 
 <!-- <li> <a href="javascript:toggle_vis('projectsmore')">Show more</a> </li>
 
@@ -24,3 +24,4 @@
 </div>
 
 </ul>
+
