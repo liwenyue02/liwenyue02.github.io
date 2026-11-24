@@ -1,0 +1,479 @@
+---
+layout: project
+title: "Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models"
+description: "AAW is a sparse, ambiguity-aware watermark for LLMs that uses 38.4% fewer watermark tokens while improving detection under paraphrasing."
+permalink: /papers/less-is-more/
+lang: en
+lang_switch_url: /papers/less-is-more/zh/
+lang_switch_label: 切换至中文
+lang_switch_hreflang: zh-CN
+---
+
+<section class="pj-hero" id="overview">
+  <div class="pj-container">
+    <p class="pj-kicker">ACM MMAsia 2026 · Hanoi, Vietnam</p>
+    <h1 class="pj-title">Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models</h1>
+
+    <p class="pj-authors">
+      Yutong Wu<sup>1,*</sup>, Li Zheng<sup>2,*</sup>,
+      <span class="pj-self">Wenyue Li</span><sup>3</sup>,
+      Hewang Nie<sup>4</sup>, Pingyi Hu<sup>1</sup>, Jianwei Li<sup>1</sup>,
+      Zili Li<sup>5</sup>, Xiaojing Ma<sup>1</sup>,
+      <strong>Songfeng Lu</strong><sup>1,✉</sup>
+    </p>
+    <p class="pj-affil">
+      <sup>1</sup> Huazhong University of Science and Technology ·
+      <sup>2</sup> Wuhan University ·
+      <sup>3</sup> Hubei Yihua Group Co., Ltd. ·
+      <sup>4</sup> Guangxi Normal University ·
+      <sup>5</sup> Central China Normal University
+    </p>
+    <p class="pj-notes">* Equal contribution. &nbsp;✉ Corresponding author.</p>
+
+    <div class="pj-actions">
+      <a class="pj-btn pj-btn-primary" href="{{ '/assets/files/less-is-more-aaw-mmasia-2026.pdf' | relative_url }}" target="_blank" rel="noopener">PDF</a>
+      <a class="pj-btn" href="https://doi.org/10.1145/3862739.3863375" target="_blank" rel="noopener">DOI</a>
+      <a class="pj-btn" href="#citation">BibTeX</a>
+    </div>
+
+    <figure class="pj-hero-figure">
+      <a class="pj-figure-link" href="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" target="_blank" rel="noopener">
+        <img src="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" width="1950" height="1243" loading="eager" decoding="async" alt="Overview of the AAW framework">
+      </a>
+      <figcaption class="pj-caption">
+        <strong>Figure 3.</strong> Overview of AAW. Stage 1 selects sparse, high-ambiguity positions and embeds a semantic payload; Stage 2 detects the watermark using only public auxiliary models; panel C details the semantic encoder and multiplicative logit modulation.
+        <a href="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" target="_blank" rel="noopener">Open full figure ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-stats">
+      <div class="pj-stat">
+        <strong>38.7</strong>
+        <span>watermark tokens<br>vs 62.8 for entropy-only gating</span>
+      </div>
+      <div class="pj-stat">
+        <strong>+37</strong>
+        <span>detection score<br>87.18 vs 50.38 unwatermarked</span>
+      </div>
+      <div class="pj-stat">
+        <strong>0.951</strong>
+        <span>ROC-AUC<br>under GPT paraphrase</span>
+      </div>
+      <div class="pj-stat">
+        <strong>7.66</strong>
+        <span>perplexity<br>vs 8.74 for Adaptive</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pj-news-strip">
+  <div class="pj-container pj-news-inner">
+    <span class="pj-news-label">News</span>
+    <span><strong>2026-11</strong> — Project page and paper PDF are online.</span>
+    <span><strong>2026-12</strong> — ACM MMAsia 2026, Hanoi, Vietnam.</span>
+  </div>
+</div>
+
+<section class="pj-section" id="motivation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Motivation</p>
+      <h2>Entropy is not ambiguity.</h2>
+    </div>
+    <p class="pj-lead">
+      Existing adaptive watermarks decide where to embed by predictive entropy. But entropy conflates aleatoric uncertainty — the inherent ambiguity of the context — with <span class="pj-mark">epistemic uncertainty</span>, which reflects what the model does not know. AAW targets the latter.
+    </p>
+
+    <div class="pj-grid-2">
+      <div>
+        <p>
+          At high-ambiguity positions, predictive entropy is actually <strong>lower</strong> than at low-ambiguity positions (<span class="pj-key">2.04 vs 2.86</span>), while Monte Carlo dropout exposes an ambiguity score an order of magnitude higher (<span class="pj-mark">3.35e-7 vs 2.99e-8</span>). Entropy-only gating therefore misses the positions where a watermark is easiest to detect.
+        </p>
+        <div class="pj-callout">
+          Entropy asks <em>how</em> uncertain the model is. Ambiguity asks <em>why</em> it is uncertain.
+        </div>
+      </div>
+
+      <figure class="pj-figure">
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-sm pj-table-numeric">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Entropy ↓</th>
+                <th>Gini ↑</th>
+                <th>Top-1 P ↑</th>
+                <th>Ambiguity ↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>High ambiguity</td>
+                <td>2.04</td>
+                <td>0.998</td>
+                <td>0.569</td>
+                <td><strong>3.35e-7</strong></td>
+              </tr>
+              <tr>
+                <td>Low ambiguity</td>
+                <td>2.86</td>
+                <td>0.995</td>
+                <td>0.453</td>
+                <td>2.99e-8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>
+          <strong>Table 1 (excerpt).</strong> High-ambiguity positions are not high-entropy positions. Full table in the paper.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="highlights">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Highlights</p>
+      <h2>Four reasons AAW works.</h2>
+    </div>
+    <p class="pj-lead">
+      AAW does not watermark more. It watermarks where the model is epistemically ambiguous, using a semantic payload that survives rewriting.
+    </p>
+
+    <div class="pj-highlight-grid">
+      <article class="pj-highlight-card pj-hl-pink">
+        <p class="pj-hl-label">Highlight 1</p>
+        <h3>Sparse, not dense</h3>
+        <p>AAW selects only the positions that pass the entropy and ambiguity gates, instead of watermarking every low-entropy token.</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl1-tokens.png' | relative_url }}" alt="Figure 1: AAW uses 38.7 watermark tokens versus 62.8 for entropy-only gating" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>38.7</strong> watermark tokens vs 62.8 for entropy-only gating</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-amber">
+        <p class="pj-hl-label">Highlight 2</p>
+        <h3>Ambiguity, not entropy</h3>
+        <p>High-ambiguity positions have lower predictive entropy, but an order-of-magnitude higher Monte Carlo ambiguity score.</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl2-ambiguity.png' | relative_url }}" alt="Figure 3, Stage 1: entropy pre-filtering followed by ambiguity-based pinning" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>2.04</strong> entropy vs 2.86 &middot; <strong>3.35e-7</strong> ambiguity vs 2.99e-8</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-green">
+        <p class="pj-hl-label">Highlight 3</p>
+        <h3>Quality meets robustness</h3>
+        <p>AAW keeps perplexity closer to the unwatermarked model and ranks watermarked text better under paraphrasing.</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl3-roc.png' | relative_url }}" alt="Figure 4: ROC curves under GPT paraphrase, where AAW reaches 0.951 AUC" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>0.951</strong> ROC-AUC under GPT paraphrase &middot; <strong>7.66</strong> PPL vs 8.74</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-blue">
+        <p class="pj-hl-label">Highlight 4</p>
+        <h3>Detection stays public</h3>
+        <p>The detector needs only a public auxiliary model and SP-Net. No private LLM is required at verification time.</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl4-detection.png' | relative_url }}" alt="Figure 3, Stage 2: model-agnostic detection with a public auxiliary model and SP-Net" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>0</strong> private LLM calls &middot; public MM + SP-Net only</p>
+      </article>
+    </div>
+
+    <ul class="pj-highlight-list">
+      <li><strong>38.4% fewer watermark tokens</strong> — 38.7 vs 62.8, while detection improves.</li>
+      <li><strong>+37 detection score</strong> — 87.18 vs 50.38 for unwatermarked text.</li>
+      <li><strong>0.951 ROC-AUC</strong> under GPT-3.5 paraphrase, versus 0.918 (Adaptive), 0.883 (KGW), and 0.838 (MorphMark).</li>
+      <li><strong>Better text quality than Adaptive</strong> — PPL 7.66 vs 8.74 and Log Div 10.67 vs 7.95.</li>
+      <li><strong>No private model at detection</strong> — only a public auxiliary MM and SP-Net.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="method">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Method</p>
+      <h2>Watermark less, where it matters.</h2>
+    </div>
+    <p class="pj-lead">
+      AAW combines a hierarchical gate, a semantic payload, and a quality-preserving modulation. The detector needs no access to the private LLM.
+    </p>
+
+    <figure class="pj-figure">
+      <div class="pj-figure-scroll">
+        <a class="pj-figure-link" href="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" target="_blank" rel="noopener">
+          <img src="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" width="1500" height="504" decoding="async" alt="Stage 1 of AAW: entropy pre-filtering and ambiguity-based pinning">
+        </a>
+      </div>
+      <figcaption>
+        <strong>Stage 1.</strong> Entropy pre-filtering (B.1) screens candidates; Monte Carlo dropout estimates epistemic ambiguity (B.2) and pinpoints sparse positions for watermarking.
+        <a href="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" target="_blank" rel="noopener">Open full figure ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-steps">
+      <article class="pj-step-card">
+        <div class="pj-step-num">1</div>
+        <h3>Where: entropy pre-filter → ambiguity pinning</h3>
+        <p>
+          A public auxiliary model measures predictive entropy. Only low-entropy candidates pass. For each candidate, N = 8 Monte Carlo dropout passes estimate epistemic ambiguity; positions above τ<sub>A</sub> are kept. The gate g<sub>t</sub> is 1 only when both tests agree.
+        </p>
+        <p class="pj-small">Result: 38.7 watermark tokens, 38.4% fewer than entropy-only gating (62.8).</p>
+      </article>
+
+      <article class="pj-step-card">
+        <div class="pj-step-num">2</div>
+        <h3>What: semantic payload + multiplicative modulation</h3>
+        <p>
+          A Sentence-BERT encoder and SP-Net map the local context to a binary payload q<sub>t</sub>. At selected steps, AAW scales the original logits. Because the modulation is multiplicative, it preserves the shape of the next-token distribution.
+        </p>
+        <div class="pj-formula">L′<sub>t</sub> = L<sub>t</sub> ⊙ (1 + g<sub>t</sub> · δ · q<sub>t</sub>), &nbsp; δ = 0.5</div>
+      </article>
+
+      <article class="pj-step-card">
+        <div class="pj-step-num">3</div>
+        <h3>How: model-agnostic detection</h3>
+        <p>
+          The detector only needs the public auxiliary MM and SP-Net. It re-identifies candidate positions from the text, regenerates the payload, and counts matches k. A z-test against the null gives the final decision — no private LLM access required.
+        </p>
+        <div class="pj-formula">z = (k − m/2) / √(m/4)</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="results">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Results</p>
+      <h2>Stronger marks, better text.</h2>
+    </div>
+    <p class="pj-lead">
+      We evaluate on Llama-7B and OPT-1.3B. Table 2 reports Llama-7B; the full paper includes both models and a broader attack suite.
+    </p>
+
+    <div class="pj-table-wrap">
+      <table class="pj-table pj-table-numeric">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>PPL ↓</th>
+            <th>Log Div. ↑</th>
+            <th>Del. AUC ↑</th>
+            <th>SynSub AUC ↑</th>
+            <th>ROC-AUC ↑</th>
+            <th>Best F1 ↑</th>
+            <th>TPR@1% ↑</th>
+            <th>TPR@5% ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Unwatermarked</td>
+            <td>6.44 ± 1.45</td>
+            <td>11.70 ± 4.77</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>KGW</td>
+            <td>6.58 ± 1.54</td>
+            <td>10.44 ± 3.92</td>
+            <td>0.9991</td>
+            <td>0.9852</td>
+            <td>0.8835</td>
+            <td>0.8177</td>
+            <td>0.4200</td>
+            <td>0.5500</td>
+          </tr>
+          <tr>
+            <td>MorphMark</td>
+            <td>5.78 ± 1.53</td>
+            <td>10.18 ± 3.69</td>
+            <td>0.9930</td>
+            <td>0.9746</td>
+            <td>0.8882</td>
+            <td>0.7945</td>
+            <td>0.8000</td>
+            <td>0.4200</td>
+          </tr>
+          <tr>
+            <td>Adaptive</td>
+            <td>8.74 ± 2.00</td>
+            <td>7.95 ± 2.46</td>
+            <td>0.9998</td>
+            <td>1.0000</td>
+            <td>0.7927</td>
+            <td>0.9246</td>
+            <td>0.8400</td>
+            <td>0.9000</td>
+          </tr>
+          <tr class="pj-highlight">
+            <td>AAW (Ours)</td>
+            <td>7.66 ± 1.59</td>
+            <td>10.67 ± 4.80</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>0.9511</td>
+            <td>0.8335</td>
+            <td>0.7900</td>
+            <td>0.8600</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pj-small" style="margin-top:10px;">
+      <strong>Table 2.</strong> Quality–robustness trade-off on Llama-7B. AAW achieves the best ROC-AUC and near-perfect deletion / synonym AUCs, while keeping perplexity and lexical diversity closer to the unwatermarked model than Adaptive. Adaptive remains stronger at strict low-FPR operating points (TPR@1%: 0.840 vs 0.790).
+    </p>
+
+    <h3 style="margin-top:44px;">Less is more</h3>
+    <figure class="pj-figure pj-figure-narrow">
+      <img src="{{ '/assets/img/papers/less-is-more/figure1-token-counts.png' | relative_url }}" width="1018" height="459" loading="lazy" decoding="async" alt="Watermark token counts across gating strategies">
+      <figcaption>
+        <strong>Figure 1.</strong> Watermark tokens required by different gating strategies. AAW11 uses 38.7 tokens, versus 62.8 for entropy-only AAW10.
+      </figcaption>
+    </figure>
+    <figure class="pj-figure pj-figure-narrow" style="margin-top:24px;">
+      <img src="{{ '/assets/img/papers/less-is-more/figure2-score-distributions.png' | relative_url }}" width="1022" height="514" loading="lazy" decoding="async" alt="Detection score distributions across gating strategies">
+      <figcaption>
+        <strong>Figure 2.</strong> Detection-score distributions. AAW11 reaches a mean score of 87.18, about 37 points above the unwatermarked score of 50.38.
+      </figcaption>
+    </figure>
+
+    <h3 style="margin-top:44px;">Robust to paraphrasing</h3>
+    <figure class="pj-figure pj-figure-narrow">
+      <img src="{{ '/assets/img/papers/less-is-more/figure4-roc-paraphrase.png' | relative_url }}" width="1026" height="780" loading="lazy" decoding="async" alt="ROC curves under GPT paraphrase">
+      <figcaption>
+        <strong>Figure 4.</strong> ROC curves under GPT-3.5 paraphrase. AAW11 reaches 0.951 AUC, compared with 0.918 (Adaptive), 0.883 (KGW), and 0.838 (MorphMark).
+      </figcaption>
+    </figure>
+
+    <h3 style="margin-top:44px;">Across the attack suite</h3>
+    <figure class="pj-figure">
+      <img src="{{ '/assets/img/papers/less-is-more/figure5-roc-suite.png' | relative_url }}" width="1030" height="539" loading="lazy" decoding="async" alt="ROC curves for four gating variants under eight attacks">
+      <figcaption>
+        <strong>Figure 5.</strong> ROC curves for the four AAW gating variants under eight untargeted attacks. Entropy gating helps with aggressive deletion; ambiguity gating drives paraphrase robustness; AAW11 combines both.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="pj-section" id="ablation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Ablation</p>
+      <h2>Both gates matter.</h2>
+    </div>
+    <p class="pj-lead">
+      Removing either gate hurts. AAW00 has no gate, AAW01 uses only ambiguity, AAW10 uses only entropy, and AAW11 uses both. Ambiguity gating is the main driver of paraphrase robustness, while entropy gating is especially useful under aggressive deletion.
+    </p>
+
+    <div class="pj-grid-2">
+      <div class="pj-table-wrap">
+        <table class="pj-table pj-table-sm pj-table-numeric">
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>Entropy</th>
+              <th>Ambiguity</th>
+              <th>Paraphrase AUC ↑</th>
+              <th>Combined-medium AUC ↑</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AAW00</td>
+              <td>—</td>
+              <td>—</td>
+              <td>0.883</td>
+              <td>0.863</td>
+            </tr>
+            <tr>
+              <td>AAW01</td>
+              <td>—</td>
+              <td>✓</td>
+              <td>0.944</td>
+              <td>0.871</td>
+            </tr>
+            <tr>
+              <td>AAW10</td>
+              <td>✓</td>
+              <td>—</td>
+              <td>0.918</td>
+              <td>0.892</td>
+            </tr>
+            <tr class="pj-highlight">
+              <td>AAW11</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>0.951</td>
+              <td>0.932</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pj-card">
+        <h3>What the ablation says</h3>
+        <p>
+          Ambiguity-only AAW01 raises paraphrase AUC from 0.883 to 0.944. Entropy-only AAW10 improves the combined-medium attack from 0.863 to 0.892. Combining both gates gives the best result on both fronts: <strong>0.951</strong> paraphrase AUC and <strong>0.932</strong> combined-medium AUC.
+        </p>
+        <p class="pj-small">
+          AAW11 also uses 38.7 tokens versus 62.8 for AAW10, so the gain is not bought with a denser watermark.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="conclusion">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Conclusion</p>
+      <h2>Less is more — if you choose the right positions.</h2>
+    </div>
+    <p class="pj-lead">
+      AAW replaces “watermark more” with “watermark where it matters”: a sparse set of epistemically ambiguous positions, a semantic payload, and a public detector. The result is fewer watermark tokens, better text quality, and stronger robustness to paraphrasing.
+    </p>
+    <div class="pj-callout">
+      <strong>Limitation.</strong> Monte Carlo dropout adds inference overhead (N = 8 forward passes per candidate). Reducing this cost is a natural next step.
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="citation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Citation</p>
+      <h2>Cite this work.</h2>
+    </div>
+    <p class="pj-lead">If you find this work useful, please cite:</p>
+
+    <div class="pj-citation-wrap">
+      <button class="pj-copy-btn" type="button" data-copy="#bibtex">Copy</button>
+      <pre class="pj-citation" id="bibtex">@inproceedings{wu2026less,
+  author    = {Yutong Wu and Li Zheng and Wenyue Li and Hewang Nie and Pingyi Hu and Jianwei Li and Zili Li and Xiaojing Ma and Songfeng Lu},
+  title     = {Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models},
+  booktitle = {Proceedings of the ACM Multimedia Asia (MMAsia '26)},
+  year      = {2026},
+  address   = {Hanoi, Vietnam},
+  publisher = {ACM},
+  doi       = {10.1145/3862739.3863375}
+}</pre>
+    </div>
+
+    <p class="pj-small" style="margin-top:14px;">
+      DOI: <a href="https://doi.org/10.1145/3862739.3863375" target="_blank" rel="noopener">10.1145/3862739.3863375</a>
+    </p>
+  </div>
+</section>

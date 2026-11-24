@@ -1,0 +1,43 @@
+{% assign paper = site.data.publications.main | where: "slug", page.paper_slug | first %}
+{% if paper %}
+<div class="paper-page">
+  <p class="paper-kicker">{{ paper.conference_short }}{% if paper.category %} · {{ paper.category }}{% endif %}</p>
+  <h1 class="paper-title">{{ paper.title }}</h1>
+  <div class="paper-authors">{{ paper.authors | replace: "Wenyue Li", '<span class="self-author-highlight">Wenyue Li</span>' }}</div>
+  <p class="paper-venue"><em>{{ paper.conference }}</em></p>
+  {% if paper.others %}
+  <p class="paper-doi">{{ paper.others }}</p>
+  {% endif %}
+
+  <div class="paper-actions">
+    {% if paper.pdf %}<a href="{{ paper.pdf }}" target="_blank" rel="noopener">PDF</a>{% endif %}
+    {% if paper.HTML %}<a href="{{ paper.HTML }}" target="_blank" rel="noopener">HTML</a>{% endif %}
+    {% if paper.code %}<a href="{{ paper.code }}" target="_blank" rel="noopener">Code</a>{% endif %}
+  </div>
+
+  {% if paper.hero_image or paper.image %}
+  <figure class="paper-figure">
+    <img src="{{ paper.hero_image | default: paper.image | relative_url }}" alt="{{ paper.title | escape }} figure">
+    {% if paper.figure_caption %}<figcaption>{{ paper.figure_caption }}</figcaption>{% endif %}
+  </figure>
+  {% endif %}
+
+  {% if paper.abstract %}
+  <h2>Abstract</h2>
+  <p>{{ paper.abstract }}</p>
+  {% endif %}
+
+  {% if paper.highlights %}
+  <h2>Highlights</h2>
+  <ul class="paper-highlights">
+    {% for item in paper.highlights %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <p class="paper-back"><a class="back-about-link" href="{{ '/#publications' | relative_url }}">Back to Publications</a></p>
+</div>
+{% else %}
+<p>Paper not found.</p>
+{% endif %}

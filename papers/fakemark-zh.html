@@ -1,0 +1,716 @@
+---
+layout: project
+title: "FakeMark：基于梯度引导与鲁棒特征融合的伪造水印声明"
+description: "FakeMark 仅依赖白盒代理模型构造伪造水印密钥，无需查询受害者模型，在 CIFAR-10 上取得 1.00、在 ImageNet 上取得 0.99 的最优行为准确率。"
+permalink: /papers/fakemark/zh/
+lang: zh-CN
+lang_switch_url: /papers/fakemark/
+lang_switch_label: 切换至英文
+lang_switch_hreflang: en
+extra_css: /assets/css/fakemark.css
+extra_js: /assets/js/fakemark-gallery.js
+footer_note: "© 2026 李文月 · Cybersecurity 9:217 (2026)"
+nav_links:
+  - label: 概览
+    href: "#overview"
+  - label: 动机
+    href: "#motivation"
+  - label: 方法
+    href: "#method"
+  - label: 结果
+    href: "#results"
+  - label: 图示
+    href: "#visuals"
+  - label: 结论
+    href: "#takeaways"
+  - label: 引用
+    href: "#citation"
+---
+
+<div class="fm">
+  <header class="fm-hero" id="overview">
+    <div class="fm-wrap">
+      <span class="fm-kicker">Cybersecurity · 2026 · 9:217</span>
+      <h1 class="fm-title"><span class="fm-grad">FakeMark</span>：基于梯度引导与鲁棒特征融合的伪造水印声明</h1>
+
+      <p class="fm-authors">
+        Yutong Wu<sup>1</sup>,
+        <span class="fm-self">李文月</span><sup>2,3</sup>,
+        Hewang Nie<sup>4,5,6</sup>,
+        Ziqi Zhou<sup>7</sup>,
+        Jin Li<sup>8</sup>,
+        Yixiao Gong<sup>1,9</sup>,
+        <strong>Songfeng Lu</strong><sup>1,10,*</sup>
+      </p>
+      <p class="fm-affil">
+        <span><sup>1</sup> 华中科技大学网络空间安全学院</span> ·
+        <span><sup>2</sup> 湖北宜化集团有限责任公司</span> ·
+        <span><sup>3</sup> 湖北宜化化工股份有限公司</span> ·
+        <span><sup>4</sup> 广西师范大学</span> ·
+        <span><sup>5</sup> 广西多源信息挖掘与安全重点实验室</span> ·
+        <span><sup>6</sup> 教育智能技术高校工程研究中心</span> ·
+        <span><sup>7</sup> 重庆大学计算机学院</span> ·
+        <span><sup>8</sup> 华中科技大学同济医学院附属同济医院</span> ·
+        <span><sup>9</sup> 华中科技大学设计学院</span> ·
+        <span><sup>10</sup> 深圳华中科技大学研究院</span>
+      </p>
+      <p class="fm-notes">* 通讯作者 · 开放获取</p>
+
+      <div class="fm-links">
+        <a class="fm-btn" href="{{ '/assets/files/fakemark-cybersecurity-2026.pdf' | relative_url }}" target="_blank" rel="noopener">PDF</a>
+        <a class="fm-btn fm-btn--ghost" href="https://doi.org/10.1186/s42400-026-00654-8" target="_blank" rel="noopener">DOI</a>
+        <a class="fm-btn fm-btn--ghost" href="#citation">BibTeX</a>
+      </div>
+
+      <figure class="fm-teaser">
+        <div class="fm-fig">
+          <img src="{{ '/assets/img/papers/fakemark/fig1-motivation.png' | relative_url }}" width="1600" height="704" loading="eager" decoding="async" alt="FakeMark 研究动机：所有权声明流程与特征空间直觉">
+        </div>
+        <figcaption class="fm-figcap">
+          <b>图 1.</b> 所有权声明场景。模型所有者与攻击者向同一个验证者提交行为证据；伪造密钥可以让模型朝目标类别偏移，却不需要任何鲁棒性保证。
+        </figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="fm-strip">
+    <div class="fm-wrap fm-strip-inner">
+      <div class="fm-stat">
+        <b>1.00</b>
+        <span>最优 FcAcc<br>CIFAR-10</span>
+      </div>
+      <div class="fm-stat">
+        <b>0.99</b>
+        <span>最优 FcAcc<br>ImageNet</span>
+      </div>
+      <div class="fm-stat">
+        <b>0.990</b>
+        <span>目标标签 ASR<br>对比最优基线 0.940</span>
+      </div>
+      <div class="fm-stat">
+        <b>16 + 8</b>
+        <span>种架构<br>八种水印变体</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="fm-sec" id="abstract">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">摘要</span>
+        <h2>所有权验证读取的是行为，而非来源。</h2>
+      </div>
+      <div class="fm-measure">
+        <p>
+          模型水印通过验证模型对秘密密钥集的响应来支撑知识产权声明。但这种仅依赖行为的接口容易受到伪造证据的攻击。FakeMark 是一种面向图像分类器的梯度引导伪造声明攻击：它只使用白盒代理模型，在构造攻击时从不查询或访问受害者模型。
+        </p>
+        <p>
+          方法先缓存干净代理批次中选定卷积层与全连接层的输出，再通过随机多层、逐通道插值将其注入前向过程。在 16 种架构、一个对抗训练的 ResNet-50 检查点和八种水印变体上，回溯式最优行为目标标签准确率在 CIFAR-10 上达到 1.00，在 ImageNet 上达到 0.99。匹配基线与检测器分析共同说明，需要面向来源感知的多因素所有权协议。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="motivation">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">动机</span>
+        <h2>触发响应并不能证明训练来源。</h2>
+        <p>验证者只看到模型对密钥集产生了反应。这说明模型做了什么，却无法说明是谁训练了它、密钥又是如何产生的。</p>
+      </div>
+
+      <div class="fm-card-grid">
+        <article class="fm-card">
+          <span class="fm-num">1</span>
+          <h3>只检查接口</h3>
+          <p>只要触发输入复现验证标签，声明就会被接受。验证者从未看到这些输入是如何构造的。</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-num">2</span>
+          <h3>无需访问受害者</h3>
+          <p>FakeMark 在白盒代理模型上优化伪造密钥，受害者模型只在最终行为评分时被调用一次。</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-num">3</span>
+          <h3>扰动预算真实</h3>
+          <p>每个伪造密钥都被投影到半径 ε = 16/255 的 ℓ<sub>∞</sub> 球内：这是有界扰动，而不是植入后门。</p>
+        </article>
+      </div>
+
+      <p class="fm-quote">触发响应说明模型产生了某种行为，却不能说明这种行为为何出现。</p>
+
+      <div class="fm-note">
+        <strong>威胁模型。</strong> 攻击者拥有一个或多个公开代理模型的白盒梯度、公开数据分布、验证接口的行为形式，以及一个选定的目标标签。攻击者不拥有受害者模型的查询、梯度、参数或架构，也无法访问合法密钥。
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec" id="method">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">方法</span>
+        <h2>缓存干净特征，再随机融合。</h2>
+        <p>分为两个阶段：先记录代理模型的干净模块输出，再在优化目标 logit 的过程中把这些特征插值进前向计算。</p>
+      </div>
+
+      <figure class="fm-figure">
+        <div class="fm-fig">
+          <img src="{{ '/assets/img/papers/fakemark/fig2-framework.png' | relative_url }}" width="1600" height="744" loading="lazy" decoding="async" alt="FakeMark 框架：干净特征缓存与随机特征融合">
+        </div>
+        <figcaption>
+          <b>图 2.</b> (a) 缓存阶段记录干净代理批次中选定卷积层与全连接层的输出。(b) 随机特征融合在目标 logit 优化过程中，对参考特征做批次置换并按通道插值。
+        </figcaption>
+      </figure>
+
+      <div class="fm-steps">
+        <article class="fm-step">
+          <h3><span>1</span>缓存干净参考</h3>
+          <p>将干净批次输入代理模型，保存选定卷积层的预激活输出以及最终全连接层输出。</p>
+        </article>
+        <article class="fm-step">
+          <h3><span>2</span>跨层、跨通道融合</h3>
+          <p>随机门控模块、置换批次维度，并用新的系数 α ~ U(0, α<sub>max</sub>) 对每个通道做插值。</p>
+        </article>
+        <article class="fm-step">
+          <h3><span>3</span>优化目标 logit</h3>
+          <p>在 ℓ<sub>∞</sub> 预算下对输入批次执行 PGD，使每个伪造密钥在保持有界的同时最大化目标类别。</p>
+        </article>
+      </div>
+
+      <div class="fm-formula">
+        F̃<sup>(l,t)</sup> = (1 − ζ<sub>t</sub><sup>(l)</sup> α<sub>t,n,c</sub><sup>(l)</sup>) F<sup>(l,t)</sup> + ζ<sub>t</sub><sup>(l)</sup> α<sub>t,n,c</sub><sup>(l)</sup> C<sup>(l)</sup><sub>π<sub>t</sub><sup>(l)</sup>(n),c,u</sub>
+        <br>
+        J<sub>FM</sub>(X) = Σ<sub>n</sub> z<sub>v<sub>kb</sub></sub>(f′<sub>ω</sub>(X; {C<sup>(l)</sup>}))<sub>n</sub>
+        <small>融合按选定模块执行；ζ 为伯努利门控，π 为每次迭代重新生成的批次置换。CIFAR-10 使用 (α<sub>max</sub>, p) = (0.75, 0.25)；ImageNet 使用 (0.50, 0.10)。</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="results">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">结果</span>
+        <h2>最优行为证据达到 1.00。</h2>
+        <p>在 16 种架构、一个对抗训练的 ResNet-50 检查点和八种水印变体上，伪造密钥无需在构造期间访问受害者，即可复现其目标标签。</p>
+      </div>
+
+            <div class="fm-tabs fm-tabs--tables" role="tablist" aria-label="结果表格">
+        <button class="fm-tab is-active" type="button" role="tab" aria-selected="true" data-sheet="t6">最优结果 &middot; 表 6</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="transfer">迁移 &middot; 表 7&ndash;8</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="screening">输入筛查 &middot; 表 9</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="detectors">检测器 &middot; 表 10</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="ablation">消融 &middot; 表 12</button>
+      </div>
+
+      <div class="fm-tsheets">
+        <div class="fm-tsheet is-active" data-sheet="t6">
+          <div class="fm-table-block">
+        <p class="fm-table-title">审计范围内的最优目标标签准确率</p>
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>水印类别</th>
+                <th>CIFAR-10 · Liu et al. 2024</th>
+                <th>CIFAR-10 · FakeMark</th>
+                <th>ImageNet · Liu et al. 2024</th>
+                <th>ImageNet · FakeMark</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>模型无关</td>
+                <td>0.99</td>
+                <td><strong>1.00</strong></td>
+                <td>0.84</td>
+                <td><strong>0.99</strong></td>
+              </tr>
+              <tr>
+                <td>模型相关</td>
+                <td>0.99</td>
+                <td><strong>1.00</strong></td>
+                <td>0.85</td>
+                <td><strong>0.95</strong></td>
+              </tr>
+              <tr>
+                <td>主动式</td>
+                <td>0.89</td>
+                <td><strong>1.00</strong></td>
+                <td>0.78</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>参数编码</td>
+                <td>—</td>
+                <td><strong>1.00</strong></td>
+                <td>—</td>
+                <td><strong>0.95</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub">
+          <strong>表 6.</strong> 这是跨协议的参考，而不是假设一致的排行榜：两项研究在构造方式与验证范围上并不相同。ImageNet DAWN 被排除，因为所评估的模型无法同时保持任务准确率与原生水印响应。
+        </p>
+      </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="transfer" hidden>
+          <div class="fm-table-pair fm-table-pair--compact">
+        <div class="fm-table-block">
+          <p class="fm-table-title">固定模型的目标迁移</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>方法</th>
+                  <th>目标标签 ASR ↑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PGD</td>
+                  <td>0.860 ± 0.000</td>
+                </tr>
+                <tr>
+                  <td>MI-FGSM</td>
+                  <td>0.940 ± 0.000</td>
+                </tr>
+                <tr>
+                  <td>DI-FGSM</td>
+                  <td>0.937 ± 0.021</td>
+                </tr>
+                <tr class="pj-highlight">
+                  <td>FakeMark</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>表 7.</strong> 相同的清单、ResNet-50 代理、ADI 目标、预算与三个随机种子。</p>
+        </div>
+
+        <div class="fm-table-block">
+          <p class="fm-table-title">源架构敏感性</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>代理来源</th>
+                  <th>目标标签 ASR ↑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="pj-highlight">
+                  <td>ResNet50</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+                <tr>
+                  <td>DenseNet121</td>
+                  <td>0.907 ± 0.023</td>
+                </tr>
+                <tr class="pj-highlight">
+                  <td>MobileNetV2</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+                <tr>
+                  <td>Inception-v3</td>
+                  <td>0.727 ± 0.055</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>表 8.</strong> MobileNetV2 以远更低的 FLOPs 追平 ResNet50；Inception-v3 是较弱的来源。</p>
+        </div>
+      </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="screening" hidden>
+          <div class="fm-table-block">
+        <p class="fm-table-title">输入级筛查</p>
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>方案</th>
+                <th>L2</th>
+                <th>L∞</th>
+                <th>KS</th>
+                <th>Range</th>
+                <th>总体</th>
+                <th>中值滤波<br>合法 / 伪造</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ADI</td>
+                <td>E</td>
+                <td>E</td>
+                <td>E</td>
+                <td>E</td>
+                <td>0 / 4</td>
+                <td>0.48 / 0.64</td>
+              </tr>
+              <tr>
+                <td>Frontier</td>
+                <td>F</td>
+                <td>F</td>
+                <td>F</td>
+                <td>E</td>
+                <td>3 / 4</td>
+                <td>0.38 / 0.50</td>
+              </tr>
+              <tr>
+                <td>DAWN</td>
+                <td>F</td>
+                <td>F</td>
+                <td>F</td>
+                <td>E</td>
+                <td>3 / 4</td>
+                <td>0.42 / 0.58</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub"><strong>表 9.</strong> E = 低于阈值，F = 超过阈值。每个条目是方案级统计量，而不是样本级检测率。</p>
+      </div>
+
+      
+          <p class="fm-quote">ADI 低于全部四项筛查阈值，而 Frontier 与 DAWN 超过其中三项。这是与检测器相关的证据，而非广泛规避。</p>
+        </div>
+        <div class="fm-tsheet" data-sheet="detectors" hidden>
+          <div class="fm-table-block">
+        <p class="fm-table-title">检测器标记率</p>
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>评估子集</th>
+                <th>Maha. @95 ↓</th>
+                <th>Maha. @99 ↓</th>
+                <th>LID @95 ↓</th>
+                <th>ODIN @5 ↓</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>干净留出集</td>
+                <td>0.050</td>
+                <td>0.010</td>
+                <td>0.050</td>
+                <td>0.050</td>
+              </tr>
+              <tr class="pj-highlight">
+                <td>完整 FakeMark</td>
+                <td>0.078</td>
+                <td>0.023</td>
+                <td>0.151</td>
+                <td>0.076</td>
+              </tr>
+              <tr>
+                <td>去掉缓存</td>
+                <td>0.103</td>
+                <td>0.027</td>
+                <td>0.182</td>
+                <td>0.099</td>
+              </tr>
+              <tr>
+                <td>其他消融</td>
+                <td>0.148</td>
+                <td>0.032</td>
+                <td>0.163</td>
+                <td>0.155</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub"><strong>表 10.</strong> 在统一评估池上汇总。伪造组在三类检测器下都提高了标记率，其中 LID 最明显。</p>
+      </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="ablation" hidden>
+          <div class="fm-table-block" style="max-width: 820px;">
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>条件</th>
+                <th>来源 ASR</th>
+                <th>Noise-WM FcAcc ↑</th>
+                <th>Noise-WM FcTrue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="pj-highlight">
+                <td>完整方法</td>
+                <td>0.920 ± 0.052</td>
+                <td><strong>0.727 ± 0.107</strong></td>
+                <td>0.163 ± 0.065</td>
+              </tr>
+              <tr>
+                <td>去掉批次置换</td>
+                <td>0.920 ± 0.017</td>
+                <td>0.647 ± 0.032</td>
+                <td>0.173 ± 0.040</td>
+              </tr>
+              <tr>
+                <td>去掉干净参考缓存</td>
+                <td>1.000 ± 0.000</td>
+                <td>0.673 ± 0.163</td>
+                <td>0.230 ± 0.102</td>
+              </tr>
+              <tr>
+                <td>样本级标量混合</td>
+                <td>0.903 ± 0.042</td>
+                <td>0.590 ± 0.052</td>
+                <td>0.203 ± 0.031</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub"><strong>表 12.</strong> 随机种子 0、1、2 的均值 ± 标准差。</p>
+      </div>
+
+      
+          <div class="fm-note">
+        完整方法比去掉置换与标量混合分别高 0.080 与 0.137 的平均 FcAcc。去掉干净缓存会把<em>来源</em> ASR 提升到 1.000，却把<em>受害者</em> FcAcc 降到 0.673——说明这些随机组件影响的是跨模型行为，而不仅仅是对代理模型的拟合。
+      </div>
+        </div>
+      </div>
+
+      <div class="fm-note fm-note--warn">
+        <strong>如何理解这些数字。</strong> 这些是审计代理池上的回溯式最优值，并不意味着无需受害者反馈就能挑出高迁移代理。在 ImageNet 上，迁移率从接近 0（ResNet18、VGG16）到 0.99（ResNet-50 L2），架构与检查点兼容性才是核心条件。
+      </div>
+    </div>
+  </section>
+
+<section class="fm-sec" id="visuals">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">图示</span>
+        <h2>横向对比伪造密钥。</h2>
+        <p>13 张卡片，三个视角：按样本对比伪造密钥、按源架构查看 Grad-CAM、按数据集查看感知质量。</p>
+      </div>
+
+      <div class="fm-tabs" role="tablist" aria-label="图示分类">
+        <button class="fm-tab is-active" type="button" role="tab" aria-selected="true" data-filter="all">全部 · 13</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="keys">伪造密钥 · 4</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="cam">Grad-CAM · 7</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="quality">质量 · 2</button>
+      </div>
+
+      <div class="fm-gallery">
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-1.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-1.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="示例 1：干净输入、ADI 伪造密钥与 DAWN 伪造密钥">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">伪造密钥</span>
+            <h3>示例 1</h3>
+            <p>干净输入 · ADI 伪造密钥 · DAWN 伪造密钥。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-2.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-2.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="示例 2：干净输入、ADI 伪造密钥与 DAWN 伪造密钥">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">伪造密钥</span>
+            <h3>示例 2</h3>
+            <p>干净输入 · ADI 伪造密钥 · DAWN 伪造密钥。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-3.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-3.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="示例 3：干净输入、ADI 伪造密钥与 DAWN 伪造密钥">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">伪造密钥</span>
+            <h3>示例 3</h3>
+            <p>干净输入 · ADI 伪造密钥 · DAWN 伪造密钥。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-4.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-4.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="示例 4：干净输入、ADI 伪造密钥与 DAWN 伪造密钥">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">伪造密钥</span>
+            <h3>示例 4</h3>
+            <p>干净输入 · ADI 伪造密钥 · DAWN 伪造密钥。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-1.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-1.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="ResNet-18 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>ResNet-18</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-2.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-2.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="ResNet-50 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>ResNet-50</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-3.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-3.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="VGG-16 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>VGG-16</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-4.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-4.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="Inception-v3 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>Inception-v3</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-5.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-5.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="EfficientNet-B0 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>EfficientNet-B0</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-6.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-6.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="DenseNet-121 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>DenseNet-121</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-7.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-7.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="MobileNetV2 Grad-CAM：输入、对抗样本叠加图与原图叠加图">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>MobileNetV2</h3>
+            <p>输入 · 对抗叠加图 · 原图叠加图。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="quality">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/quality-cifar.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/quality-cifar.png' | relative_url }}" width="670" height="370" loading="lazy" decoding="async" alt="CIFAR-10 不同代理配置下的 PSNR 与 SSIM">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">质量</span>
+            <h3>CIFAR-10</h3>
+            <p>PSNR 25.73–26.83 dB · SSIM 0.88–0.91。</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="quality">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/quality-imagenet.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/quality-imagenet.png' | relative_url }}" width="670" height="370" loading="lazy" decoding="async" alt="ImageNet 不同代理配置下的 PSNR 与 SSIM">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">质量</span>
+            <h3>ImageNet</h3>
+            <p>PSNR 24.38–27.35 dB · SSIM 0.72–0.82。</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="fm-gnote">
+        原始大图：
+        <a href="{{ '/assets/img/papers/fakemark/fig3-examples.jpg' | relative_url }}" target="_blank" rel="noopener">图 3 伪造密钥</a> ·
+        <a href="{{ '/assets/img/papers/fakemark/fig4-gradcam.jpg' | relative_url }}" target="_blank" rel="noopener">图 4 Grad-CAM</a> ·
+        <a href="{{ '/assets/img/papers/fakemark/fig5-psnr.png' | relative_url }}" target="_blank" rel="noopener">图 5 PSNR/SSIM</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="takeaways">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">结论</span>
+        <h2>这对所有权验证意味着什么。</h2>
+      </div>
+
+      <div class="fm-takeaways">
+        <article class="fm-card">
+          <span class="fm-tag">启示</span>
+          <h3>行为不等于来源</h3>
+          <p>成功的触发响应无法区分合法所有者与精心构造的伪造者。裁决者看到的是行为，而不是行为的来源。</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-tag">条件</span>
+          <h3>兼容性胜过容量</h3>
+          <p>MobileNetV2 以 0.990 追平 ResNet50，Inception-v3 为 0.727，部分 ImageNet 组合接近 0。模型大小本身并不能解释迁移。</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-tag">协议</span>
+          <h3>多因素验证</h3>
+          <p>将行为测试与密钥或来源的密码学承诺、结构指纹以及后处理条件下的验证结合起来。</p>
+        </article>
+      </div>
+
+      <div class="fm-note fm-note--warn">
+        <strong>局限性。</strong> FakeMark 假设具备白盒代理梯度与数据集级重叠；CIFAR-10 的代理与目标还共享标准训练划分。线性分析仅作解释用途，主表使用单一固定目标标签，研究范围限于图像分类。
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec" id="citation">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">引用</span>
+        <h2>引用本文。</h2>
+      </div>
+
+      <div class="fm-citation">
+        <div class="pj-citation-wrap">
+          <button class="pj-copy-btn" type="button" data-copy="#bibtex">复制</button>
+          <pre class="pj-citation" id="bibtex">@article{wu2026fakemark,
+  author  = {Yutong Wu and Wenyue Li and Hewang Nie and Ziqi Zhou and Jin Li and Yixiao Gong and Songfeng Lu},
+  title   = {FakeMark: gradient-guided false watermark claims via robust feature fusion},
+  journal = {Cybersecurity},
+  volume  = {9},
+  pages   = {217},
+  year    = {2026},
+  doi     = {10.1186/s42400-026-00654-8}
+}</pre>
+        </div>
+        <p class="fm-table-sub" style="text-align:left;">
+          代码与数据：<a href="https://anonymous.4open.science/r/FakeMark" target="_blank" rel="noopener">anonymous.4open.science/r/FakeMark</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>

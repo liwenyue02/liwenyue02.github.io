@@ -1,0 +1,716 @@
+---
+layout: project
+title: "FakeMark: Gradient-Guided False Watermark Claims via Robust Feature Fusion"
+description: "FakeMark constructs forged watermark keys from a white-box surrogate without ever querying the victim model, reaching 1.00 best-case behavioral accuracy on CIFAR-10 and 0.99 on ImageNet."
+permalink: /papers/fakemark/
+lang: en
+lang_switch_url: /papers/fakemark/zh/
+lang_switch_label: 切换至中文
+lang_switch_hreflang: zh-CN
+extra_css: /assets/css/fakemark.css
+extra_js: /assets/js/fakemark-gallery.js
+footer_note: "© 2026 Wenyue Li · Cybersecurity 9:217 (2026)"
+nav_links:
+  - label: Overview
+    href: "#overview"
+  - label: Motivation
+    href: "#motivation"
+  - label: Method
+    href: "#method"
+  - label: Results
+    href: "#results"
+  - label: Visuals
+    href: "#visuals"
+  - label: Takeaways
+    href: "#takeaways"
+  - label: Citation
+    href: "#citation"
+---
+
+<div class="fm">
+  <header class="fm-hero" id="overview">
+    <div class="fm-wrap">
+      <span class="fm-kicker">Cybersecurity · 2026 · 9:217</span>
+      <h1 class="fm-title"><span class="fm-grad">FakeMark</span>: Gradient-Guided False Watermark Claims via Robust Feature Fusion</h1>
+
+      <p class="fm-authors">
+        Yutong Wu<sup>1</sup>,
+        <span class="fm-self">Wenyue Li</span><sup>2,3</sup>,
+        Hewang Nie<sup>4,5,6</sup>,
+        Ziqi Zhou<sup>7</sup>,
+        Jin Li<sup>8</sup>,
+        Yixiao Gong<sup>1,9</sup>,
+        <strong>Songfeng Lu</strong><sup>1,10,*</sup>
+      </p>
+      <p class="fm-affil">
+        <span><sup>1</sup> Huazhong University of Science and Technology</span> ·
+        <span><sup>2</sup> Hubei Yihua Group Co., Ltd.</span> ·
+        <span><sup>3</sup> Hubei Yihua Chemical Industry Co., Ltd.</span> ·
+        <span><sup>4</sup> Guangxi Normal University</span> ·
+        <span><sup>5</sup> Guangxi Key Lab of Multi-Source Information Mining and Security</span> ·
+        <span><sup>6</sup> University Engineering Research Center of Educational Intelligent Technology</span> ·
+        <span><sup>7</sup> Chongqing University</span> ·
+        <span><sup>8</sup> Tongji Hospital, HUST</span> ·
+        <span><sup>9</sup> School of Design, HUST</span> ·
+        <span><sup>10</sup> Shenzhen HUST Research Institute</span>
+      </p>
+      <p class="fm-notes">* Corresponding author · Open Access</p>
+
+      <div class="fm-links">
+        <a class="fm-btn" href="{{ '/assets/files/fakemark-cybersecurity-2026.pdf' | relative_url }}" target="_blank" rel="noopener">PDF</a>
+        <a class="fm-btn fm-btn--ghost" href="https://doi.org/10.1186/s42400-026-00654-8" target="_blank" rel="noopener">DOI</a>
+        <a class="fm-btn fm-btn--ghost" href="#citation">BibTeX</a>
+      </div>
+
+      <figure class="fm-teaser">
+        <div class="fm-fig">
+          <img src="{{ '/assets/img/papers/fakemark/fig1-motivation.png' | relative_url }}" width="1600" height="704" loading="eager" decoding="async" alt="FakeMark motivation: the ownership-claim workflow and the feature-space intuition">
+        </div>
+        <figcaption class="fm-figcap">
+          <b>Figure 1.</b> The ownership-claim setting. A model owner and an attacker submit behavioral evidence to the same verifier; a forged key can move toward a target class without a robust-feature guarantee.
+        </figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="fm-strip">
+    <div class="fm-wrap fm-strip-inner">
+      <div class="fm-stat">
+        <b>1.00</b>
+        <span>best-case FcAcc<br>CIFAR-10</span>
+      </div>
+      <div class="fm-stat">
+        <b>0.99</b>
+        <span>best-case FcAcc<br>ImageNet</span>
+      </div>
+      <div class="fm-stat">
+        <b>0.990</b>
+        <span>target-label ASR<br>vs 0.940 best baseline</span>
+      </div>
+      <div class="fm-stat">
+        <b>16 + 8</b>
+        <span>architectures audited<br>eight watermark variants</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="fm-sec" id="abstract">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Abstract</span>
+        <h2>Ownership checks read behavior, not provenance.</h2>
+      </div>
+      <div class="fm-measure">
+        <p>
+          Model watermarking supports intellectual-property claims by verifying a model's responses to a secret key set. But this behavior-only interface is vulnerable to fabricated evidence. FakeMark is a gradient-guided false-claim attack for image classifiers that uses a white-box surrogate yet never queries or accesses the victim model during attack construction.
+        </p>
+        <p>
+          The method caches selected convolutional and fully connected outputs from clean surrogate batches and injects them through stochastic multi-layer, channel-wise interpolation. Across 16 architectures, an adversarially trained ResNet-50 checkpoint, and eight watermark variants, retrospective best-case behavioral target-label accuracy reaches 1.00 on CIFAR-10 and 0.99 on ImageNet. Matched baselines and detector analyses motivate provenance-aware, multi-factor ownership protocols.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="motivation">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Motivation</span>
+        <h2>A trigger response is not proof of training.</h2>
+        <p>A verifier observes that a model reacts to a key set. That tells us what the model does — not who trained it, or how the key set was made.</p>
+      </div>
+
+      <div class="fm-card-grid">
+        <article class="fm-card">
+          <span class="fm-num">1</span>
+          <h3>Only the interface is checked</h3>
+          <p>Ownership is accepted when trigger inputs reproduce the verification labels. The verifier never sees how those inputs were produced.</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-num">2</span>
+          <h3>No victim access is needed</h3>
+          <p>FakeMark optimizes forged keys on a white-box surrogate. The victim is touched once, for the final behavioral score.</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-num">3</span>
+          <h3>The budget stays realistic</h3>
+          <p>Every forged key is projected onto an ℓ<sub>∞</sub> ball of radius ε = 16/255: a bounded perturbation, not a backdoor insertion.</p>
+        </article>
+      </div>
+
+      <p class="fm-quote">A successful trigger response shows that the model behaves in a certain way; it does not show why.</p>
+
+      <div class="fm-note">
+        <strong>Threat model.</strong> The attacker has white-box gradients of one or more public surrogates, the public data distribution, the behavioral form of the verification interface, and a chosen target label. The attacker has no queries, gradients, parameters, or architecture of the victim, and no access to the legitimate key.
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec" id="method">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Method</span>
+        <h2>Cache clean features, fuse them stochastically.</h2>
+        <p>Two stages: record clean module outputs from the surrogate, then interpolate them into the forward pass while optimizing a target logit.</p>
+      </div>
+
+      <figure class="fm-figure">
+        <div class="fm-fig">
+          <img src="{{ '/assets/img/papers/fakemark/fig2-framework.png' | relative_url }}" width="1600" height="744" loading="lazy" decoding="async" alt="Overview of the FakeMark framework: clean feature caching and stochastic feature fusion">
+        </div>
+        <figcaption>
+          <b>Figure 2.</b> (a) The cache stage records selected convolutional and fully connected layer outputs from the clean surrogate batch. (b) Stochastic feature fusion permutes these references across the batch and interpolates them by channel during target-logit optimization.
+        </figcaption>
+      </figure>
+
+      <div class="fm-steps">
+        <article class="fm-step">
+          <h3><span>1</span>Cache clean references</h3>
+          <p>Run a clean batch through the surrogate and store pre-activation outputs of selected convolutional layers, plus the final fully connected layer.</p>
+        </article>
+        <article class="fm-step">
+          <h3><span>2</span>Fuse across layers and channels</h3>
+          <p>Randomly gate modules, permute the batch dimension, and interpolate each channel with a fresh coefficient α ~ U(0, α<sub>max</sub>).</p>
+        </article>
+        <article class="fm-step">
+          <h3><span>3</span>Optimize the target logit</h3>
+          <p>Apply PGD to the input batch under an ℓ<sub>∞</sub> budget, so every forged key maximizes the chosen target class while staying bounded.</p>
+        </article>
+      </div>
+
+      <div class="fm-formula">
+        F̃<sup>(l,t)</sup> = (1 − ζ<sub>t</sub><sup>(l)</sup> α<sub>t,n,c</sub><sup>(l)</sup>) F<sup>(l,t)</sup> + ζ<sub>t</sub><sup>(l)</sup> α<sub>t,n,c</sub><sup>(l)</sup> C<sup>(l)</sup><sub>π<sub>t</sub><sup>(l)</sup>(n),c,u</sub>
+        <br>
+        J<sub>FM</sub>(X) = Σ<sub>n</sub> z<sub>v<sub>kb</sub></sub>(f′<sub>ω</sub>(X; {C<sup>(l)</sup>}))<sub>n</sub>
+        <small>Fusion is applied per selected module; ζ is a Bernoulli gate and π is a fresh batch permutation at every iteration. CIFAR-10 uses (α<sub>max</sub>, p) = (0.75, 0.25); ImageNet uses (0.50, 0.10).</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="results">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Results</span>
+        <h2>Best-case behavioral evidence reaches 1.00.</h2>
+        <p>Across 16 distinct architectures, an adversarially trained ResNet-50 checkpoint, and eight watermark variants, forged keys reproduce the victim's target label without victim access during construction.</p>
+      </div>
+
+            <div class="fm-tabs fm-tabs--tables" role="tablist" aria-label="Result tables">
+        <button class="fm-tab is-active" type="button" role="tab" aria-selected="true" data-sheet="t6">Best case &middot; T6</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="transfer">Transfer &middot; T7&ndash;8</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="screening">Screening &middot; T9</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="detectors">Detectors &middot; T10</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-sheet="ablation">Ablation &middot; T12</button>
+      </div>
+
+      <div class="fm-tsheets">
+        <div class="fm-tsheet is-active" data-sheet="t6">
+          <div class="fm-table-block">
+        <p class="fm-table-title">Audited best-case target-label accuracy</p>
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>Watermark category</th>
+                <th>CIFAR-10 · Liu et al. 2024</th>
+                <th>CIFAR-10 · FakeMark</th>
+                <th>ImageNet · Liu et al. 2024</th>
+                <th>ImageNet · FakeMark</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Model-independent</td>
+                <td>0.99</td>
+                <td><strong>1.00</strong></td>
+                <td>0.84</td>
+                <td><strong>0.99</strong></td>
+              </tr>
+              <tr>
+                <td>Model-dependent</td>
+                <td>0.99</td>
+                <td><strong>1.00</strong></td>
+                <td>0.85</td>
+                <td><strong>0.95</strong></td>
+              </tr>
+              <tr>
+                <td>Active</td>
+                <td>0.89</td>
+                <td><strong>1.00</strong></td>
+                <td>0.78</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>Parameter encoding</td>
+                <td>—</td>
+                <td><strong>1.00</strong></td>
+                <td>—</td>
+                <td><strong>0.95</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub">
+          <strong>Table 6.</strong> Cross-protocol context, not an assumption-matched leaderboard: the two studies differ in construction and verification scope. ImageNet DAWN is excluded because no evaluated model preserves both task accuracy and native watermark response.
+        </p>
+      </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="transfer" hidden>
+          <div class="fm-table-pair fm-table-pair--compact">
+        <div class="fm-table-block">
+          <p class="fm-table-title">Fixed-model targeted transfer</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Target-label ASR ↑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PGD</td>
+                  <td>0.860 ± 0.000</td>
+                </tr>
+                <tr>
+                  <td>MI-FGSM</td>
+                  <td>0.940 ± 0.000</td>
+                </tr>
+                <tr>
+                  <td>DI-FGSM</td>
+                  <td>0.937 ± 0.021</td>
+                </tr>
+                <tr class="pj-highlight">
+                  <td>FakeMark</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>Table 7.</strong> Same manifest, ResNet-50 surrogate, ADI target, budget, and three seeds.</p>
+        </div>
+
+        <div class="fm-table-block">
+          <p class="fm-table-title">Source-architecture sensitivity</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>Surrogate source</th>
+                  <th>Target-label ASR ↑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="pj-highlight">
+                  <td>ResNet50</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+                <tr>
+                  <td>DenseNet121</td>
+                  <td>0.907 ± 0.023</td>
+                </tr>
+                <tr class="pj-highlight">
+                  <td>MobileNetV2</td>
+                  <td><strong>0.990 ± 0.000</strong></td>
+                </tr>
+                <tr>
+                  <td>Inception-v3</td>
+                  <td>0.727 ± 0.055</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>Table 8.</strong> MobileNetV2 matches ResNet50 with far fewer FLOPs; Inception-v3 is the weaker source.</p>
+        </div>
+      </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="screening" hidden>
+          <div class="fm-table-block">
+        <p class="fm-table-title">Input-level screening</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>Scheme</th>
+                  <th>L2</th>
+                  <th>L∞</th>
+                  <th>KS</th>
+                  <th>Range</th>
+                  <th>Overall</th>
+                  <th>Median filter<br>legit / forged</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ADI</td>
+                  <td>E</td>
+                  <td>E</td>
+                  <td>E</td>
+                  <td>E</td>
+                  <td>0 / 4</td>
+                  <td>0.48 / 0.64</td>
+                </tr>
+                <tr>
+                  <td>Frontier</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>E</td>
+                  <td>3 / 4</td>
+                  <td>0.38 / 0.50</td>
+                </tr>
+                <tr>
+                  <td>DAWN</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>F</td>
+                  <td>E</td>
+                  <td>3 / 4</td>
+                  <td>0.42 / 0.58</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>Table 9.</strong> E = below threshold, F = exceeds threshold. Each entry is a scheme-level statistic, not a sample-level detection rate.</p>
+        </div>
+
+        
+          <p class="fm-quote">ADI stays below all four screening thresholds, while Frontier and DAWN exceed three. That is detector-dependent evidence, not broad evasion.</p>
+        </div>
+        <div class="fm-tsheet" data-sheet="detectors" hidden>
+          <div class="fm-table-block">
+          <p class="fm-table-title">Detector flag rates</p>
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>Evaluation subset</th>
+                  <th>Maha. @95 ↓</th>
+                  <th>Maha. @99 ↓</th>
+                  <th>LID @95 ↓</th>
+                  <th>ODIN @5 ↓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Clean holdout</td>
+                  <td>0.050</td>
+                  <td>0.010</td>
+                  <td>0.050</td>
+                  <td>0.050</td>
+                </tr>
+                <tr class="pj-highlight">
+                  <td>Full FakeMark</td>
+                  <td>0.078</td>
+                  <td>0.023</td>
+                  <td>0.151</td>
+                  <td>0.076</td>
+                </tr>
+                <tr>
+                  <td>FakeMark w/o cache</td>
+                  <td>0.103</td>
+                  <td>0.027</td>
+                  <td>0.182</td>
+                  <td>0.099</td>
+                </tr>
+                <tr>
+                  <td>Other ablations</td>
+                  <td>0.148</td>
+                  <td>0.032</td>
+                  <td>0.163</td>
+                  <td>0.155</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fm-table-sub"><strong>Table 10.</strong> Aggregated over a common evaluation pool. Forged groups raise flag rates under all three detectors, most under LID.</p>
+        </div>
+
+      
+        </div>
+        <div class="fm-tsheet" data-sheet="ablation" hidden>
+          <div class="fm-table-block" style="max-width: 820px;">
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-numeric">
+            <thead>
+              <tr>
+                <th>Condition</th>
+                <th>Source ASR</th>
+                <th>Noise-WM FcAcc ↑</th>
+                <th>Noise-WM FcTrue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="pj-highlight">
+                <td>Full</td>
+                <td>0.920 ± 0.052</td>
+                <td><strong>0.727 ± 0.107</strong></td>
+                <td>0.163 ± 0.065</td>
+              </tr>
+              <tr>
+                <td>No batch shuffle</td>
+                <td>0.920 ± 0.017</td>
+                <td>0.647 ± 0.032</td>
+                <td>0.173 ± 0.040</td>
+              </tr>
+              <tr>
+                <td>No clean-reference cache</td>
+                <td>1.000 ± 0.000</td>
+                <td>0.673 ± 0.163</td>
+                <td>0.230 ± 0.102</td>
+              </tr>
+              <tr>
+                <td>Sample-wise scalar mixing</td>
+                <td>0.903 ± 0.042</td>
+                <td>0.590 ± 0.052</td>
+                <td>0.203 ± 0.031</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fm-table-sub"><strong>Table 12.</strong> Mean ± standard deviation over seeds 0, 1, and 2.</p>
+      </div>
+
+      
+          <div class="fm-note">
+        The full condition exceeds no-shuffle and scalar mixing by 0.080 and 0.137 mean FcAcc. Removing the clean cache raises <em>source</em> ASR to 1.000 but lowers <em>victim</em> FcAcc to 0.673 — evidence that the stochastic components affect cross-model behavior rather than merely fitting the surrogate.
+      </div>
+        </div>
+      </div>
+
+      <div class="fm-note fm-note--warn">
+        <strong>Reading the numbers.</strong> These are retrospective best-case maxima over the audited surrogate pool, not an operational guarantee that a high-transfer surrogate can be picked without victim feedback. On ImageNet, transfer ranges from near zero (ResNet18, VGG16) to 0.99 (ResNet-50 L2), so architecture and checkpoint compatibility is the central condition.
+      </div>
+    </div>
+  </section>
+
+<section class="fm-sec" id="visuals">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Visual evidence</span>
+        <h2>Compare forged keys side by side.</h2>
+        <p>Thirteen cards, three views: forged keys by example, Grad-CAM by source architecture, and perceptual quality by dataset.</p>
+      </div>
+
+      <div class="fm-tabs" role="tablist" aria-label="Visual evidence categories">
+        <button class="fm-tab is-active" type="button" role="tab" aria-selected="true" data-filter="all">All &middot; 13</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="keys">Forged keys &middot; 4</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="cam">Grad-CAM &middot; 7</button>
+        <button class="fm-tab" type="button" role="tab" aria-selected="false" data-filter="quality">Quality &middot; 2</button>
+      </div>
+
+      <div class="fm-gallery">
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-1.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-1.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="Example 1: clean input, ADI forged key, and DAWN forged key">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Forged keys</span>
+            <h3>Example 1</h3>
+            <p>Clean input · ADI forged key · DAWN forged key.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-2.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-2.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="Example 2: clean input, ADI forged key, and DAWN forged key">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Forged keys</span>
+            <h3>Example 2</h3>
+            <p>Clean input · ADI forged key · DAWN forged key.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-3.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-3.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="Example 3: clean input, ADI forged key, and DAWN forged key">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Forged keys</span>
+            <h3>Example 3</h3>
+            <p>Clean input · ADI forged key · DAWN forged key.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="keys">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/keys-4.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/keys-4.png' | relative_url }}" width="662" height="250" loading="lazy" decoding="async" alt="Example 4: clean input, ADI forged key, and DAWN forged key">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Forged keys</span>
+            <h3>Example 4</h3>
+            <p>Clean input · ADI forged key · DAWN forged key.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-1.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-1.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="ResNet-18 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>ResNet-18</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-2.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-2.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="ResNet-50 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>ResNet-50</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-3.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-3.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="VGG-16 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>VGG-16</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-4.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-4.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="Inception-v3 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>Inception-v3</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-5.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-5.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="EfficientNet-B0 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>EfficientNet-B0</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-6.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-6.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="DenseNet-121 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>DenseNet-121</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="cam">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/cam-7.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/cam-7.png' | relative_url }}" width="602" height="230" loading="lazy" decoding="async" alt="MobileNetV2 Grad-CAM: input, adversarial overlay, and original overlay">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Grad-CAM</span>
+            <h3>MobileNetV2</h3>
+            <p>Input · adversarial overlay · original overlay.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="quality">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/quality-cifar.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/quality-cifar.png' | relative_url }}" width="670" height="370" loading="lazy" decoding="async" alt="PSNR and SSIM across CIFAR-10 surrogate configurations">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Quality</span>
+            <h3>CIFAR-10</h3>
+            <p>PSNR 25.73–26.83 dB · SSIM 0.88–0.91.</p>
+          </div>
+        </article>
+
+        <article class="fm-gcard" data-cat="quality">
+          <a class="fm-gcard-media" href="{{ '/assets/img/papers/fakemark/gallery/quality-imagenet.png' | relative_url }}" target="_blank" rel="noopener">
+            <img src="{{ '/assets/img/papers/fakemark/gallery/quality-imagenet.png' | relative_url }}" width="670" height="370" loading="lazy" decoding="async" alt="PSNR and SSIM across ImageNet surrogate configurations">
+          </a>
+          <div class="fm-gcard-body">
+            <span class="fm-gtag">Quality</span>
+            <h3>ImageNet</h3>
+            <p>PSNR 24.38–27.35 dB · SSIM 0.72–0.82.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="fm-gnote">
+        Full-resolution figures:
+        <a href="{{ '/assets/img/papers/fakemark/fig3-examples.jpg' | relative_url }}" target="_blank" rel="noopener">Fig. 3 forged keys</a> ·
+        <a href="{{ '/assets/img/papers/fakemark/fig4-gradcam.jpg' | relative_url }}" target="_blank" rel="noopener">Fig. 4 Grad-CAM</a> ·
+        <a href="{{ '/assets/img/papers/fakemark/fig5-psnr.png' | relative_url }}" target="_blank" rel="noopener">Fig. 5 PSNR/SSIM</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="fm-sec fm-soft" id="takeaways">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Takeaways</span>
+        <h2>What this means for ownership verification.</h2>
+      </div>
+
+      <div class="fm-takeaways">
+        <article class="fm-card">
+          <span class="fm-tag">Implication</span>
+          <h3>Behavior is not provenance</h3>
+          <p>A successful trigger response cannot distinguish a legitimate owner from a well-constructed forger. The arbiter sees the behavior, not its origin.</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-tag">Condition</span>
+          <h3>Compatibility beats capacity</h3>
+          <p>MobileNetV2 matches ResNet50 at 0.990, Inception-v3 reaches 0.727, and some ImageNet pairs stay near zero. Model size alone does not explain transfer.</p>
+        </article>
+        <article class="fm-card">
+          <span class="fm-tag">Protocol</span>
+          <h3>Verify with multiple factors</h3>
+          <p>Pair behavioral tests with cryptographic commitments to keys or provenance, structural fingerprints, and validation under post-processing.</p>
+        </article>
+      </div>
+
+      <div class="fm-note fm-note--warn">
+        <strong>Limitations.</strong> FakeMark assumes white-box surrogate gradients and dataset-level overlap; CIFAR-10 surrogates and targets also share the standard training split. The linear analysis is explanatory, the main tables use one fixed target label, and the study is limited to image classification.
+      </div>
+    </div>
+  </section>
+
+  <section class="fm-sec" id="citation">
+    <div class="fm-wrap">
+      <div class="fm-head">
+        <span class="fm-eyebrow">Citation</span>
+        <h2>Cite this work.</h2>
+      </div>
+
+      <div class="fm-citation">
+        <div class="pj-citation-wrap">
+          <button class="pj-copy-btn" type="button" data-copy="#bibtex">Copy</button>
+          <pre class="pj-citation" id="bibtex">@article{wu2026fakemark,
+  author  = {Yutong Wu and Wenyue Li and Hewang Nie and Ziqi Zhou and Jin Li and Yixiao Gong and Songfeng Lu},
+  title   = {FakeMark: gradient-guided false watermark claims via robust feature fusion},
+  journal = {Cybersecurity},
+  volume  = {9},
+  pages   = {217},
+  year    = {2026},
+  doi     = {10.1186/s42400-026-00654-8}
+}</pre>
+        </div>
+        <p class="fm-table-sub" style="text-align:left;">
+          Code and data: <a href="https://anonymous.4open.science/r/FakeMark" target="_blank" rel="noopener">anonymous.4open.science/r/FakeMark</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>

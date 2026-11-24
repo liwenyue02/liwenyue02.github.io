@@ -1,0 +1,80 @@
+main:
+
+  - title: Multi-period mean-variance portfolio optimization with capital injections
+    category: Journal
+    date: "2025"
+    authors: Longyu Shi, Yunyun Wang, Wenyue Li, <strong>Zhimin Zhang <sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong> <span class="author-note">(<sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)</span>
+    conference_short: MCS
+    conference: Mathematics and Computers in Simulation <strong>(MCS)</strong>, 2025. <strong>JCR Q1; 中科院 2 区</strong>
+    pdf: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
+    HTML: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
+    others: 'DOI: <a href="https://doi.org/10.1016/j.matcom.2025.02.006" target="_blank" rel="noopener">10.1016/j.matcom.2025.02.006</a>'
+    image: /assets/img/pub/portfolio-cimv.jpg
+    hero_image: /assets/img/pub/portfolio-cimv-hero.jpg
+    slug: portfolio-cimv
+    project: /papers/portfolio-cimv/
+    figure_caption: "Graphical abstract: the CIMV model, fused Lasso regularization, ADMM solver, and empirical performance."
+    abstract: >-
+      In this study, we explore the portfolio optimization problem where the investors initially allocate portions of their capital across a large asset pool, followed by gradual capital injections over the subsequent periods. We introduce a multi-period mean–variance model with capital injections to develop a sparse long-term investment strategy within this framework. This model adopts the fused Lasso technique, integrating two ℓ1 penalty terms designed to lower both holding and trading costs. We utilize a two-block alternating direction method of multipliers algorithm to solve this complex, non-smooth optimization problem involving multiple variables. A thorough analysis of the convergence of the algorithm is provided. In addition, we empirically validate the efficacy of our model using two real datasets, demonstrating its practical applicability and effectiveness in real-world scenarios.
+    highlights:
+      - "A multi-period mean–variance model that accounts for gradual capital injections."
+      - "Fused Lasso regularization with two ℓ1 penalties to reduce holding and trading costs."
+      - "A convergent two-block ADMM solver for the resulting non-smooth, multi-variable problem."
+      - "Validation on two real datasets, showing practical risk and cost benefits."
+    notes: ADMM、Portfolio optimization
+
+  - title: "Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models"
+    category: Conference
+    date: "2026-12"
+    authors: Yutong Wu*, Li Zheng*, Wenyue Li, Hewang Nie, Pingyi Hu, Jianwei Li, Zili Li, Xiaojing Ma, <strong>Songfeng Lu<sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong> <span class="author-note">(* Equal Contribution; <sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)</span>
+    conference_short: MMAsia
+    conference: ACM Multimedia Asia <strong>(MMAsia)</strong>, December 2026, Hanoi, Vietnam.
+    pdf: /assets/files/less-is-more-aaw-mmasia-2026.pdf
+    others: 'DOI: <a href="https://doi.org/10.1145/3862739.3863375" target="_blank" rel="noopener">10.1145/3862739.3863375</a>'
+    image: /assets/img/papers/less-is-more/framework-card.jpg
+    hero_image: /assets/img/pub/watermark-llm-hero.jpg
+    slug: less-is-more
+    project: /papers/less-is-more/
+    figure_caption: "Teaser: watermark scores (blue) versus unwatermarked scores (orange), highlighting an increase of about 37 points."
+    abstract: >-
+      Watermarking large language model (LLM) outputs helps trace synthetic text, but existing methods face a trade-off between detection robustness and text quality. We propose Ambiguity-Aware Dynamic Watermarking (AAW), a sparse Less is More approach that selects where to embed a watermark rather than increasing its strength everywhere. A hierarchical gate screens candidate generation steps by predictive entropy and then estimates epistemic ambiguity through Monte Carlo dropout. At selected steps, a semantic-coded payload modulates token logits to improve resistance to text modifications. Experiments on Llama-7B and OPT-1.3B compare AAW with established watermarking methods under deletion and paraphrasing attacks while measuring perplexity and lexical diversity. On Llama-7B, AAW achieves competitive paraphrase robustness with better perplexity and lexical diversity than an entropy-gated adaptive baseline. These results illustrate the potential of sparse, ambiguity-aware interventions for balancing watermark detectability and text quality.
+    highlights:
+      - "Sparse watermarking: choose where to intervene instead of strengthening every token."
+      - "A hierarchical entropy gate plus Monte Carlo dropout estimates epistemic ambiguity."
+      - "A semantic-coded payload improves robustness to deletion and paraphrasing."
+      - "Better perplexity and lexical diversity than an entropy-gated baseline on Llama-7B."
+    notes: Large Language Models、Text Watermarking
+
+  - title: "FakeMark: gradient-guided false watermark claims via robust feature fusion"
+    category: Journal
+    date: "2026-09"
+    authors: Yutong Wu, Wenyue Li, Hewang Nie, Ziqi Zhou, Jin Li, Yixiao Gong, <strong>Songfeng Lu<sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong> <span class="author-note">(<sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)</span>
+    conference_short: Cybersecurity
+    conference: Cybersecurity, <strong>9:217</strong>, 2026.
+    pdf: /assets/files/fakemark-cybersecurity-2026.pdf
+    others: 'DOI: <a href="https://doi.org/10.1186/s42400-026-00654-8" target="_blank" rel="noopener">10.1186/s42400-026-00654-8</a>'
+    image: /assets/img/pub/fakemark.jpg
+    hero_image: /assets/img/pub/fakemark-hero.jpg
+    slug: fakemark
+    project: /papers/fakemark/
+    figure_caption: "Figure 1: the FakeMark ownership-claim workflow and the feature-space motivation."
+    abstract: >-
+      Model watermarking supports intellectual-property claims by verifying a model's responses to a secret key set, but this behavior-only interface is vulnerable to fabricated evidence. This work presents FakeMark, a gradient-guided false-claim attack for image classifiers that uses a white-box surrogate but never queries or accesses the victim model during attack construction. Under a simplified linear decision-boundary model, targeted perturbations can acquire a nonzero component along the watermark-trigger direction; experiments on deep networks provide only conditional, setting-dependent support for this intuition. FakeMark caches selected convolutional and fully connected layer outputs from clean surrogate batches and injects them through stochastic multi-layer, channel-wise interpolation to improve transfer. Across 16 distinct architectures and an additional adversarially trained ResNet-50 checkpoint variant, over eight evaluated watermark variants, retrospective best-case behavioral target-label accuracy reaches 1.00 on CIFAR-10 and 0.99 on ImageNet. ImageNet transfer varies substantially across checkpoint and surrogate settings, ranging from near zero to 0.99. Matched baselines and detector analyses motivate provenance-aware, multi-factor ownership protocols.
+    highlights:
+      - "A gradient-guided false-claim attack that never queries or accesses the victim model during construction."
+      - "Cached surrogate features are injected through stochastic multi-layer, channel-wise interpolation."
+      - "Evaluated across 16 architectures, an adversarially trained ResNet-50, and eight watermark variants."
+      - "Retrospective best-case target-label accuracy reaches 1.00 on CIFAR-10 and 0.99 on ImageNet."
+      - "Results motivate provenance-aware, multi-factor ownership verification protocols."
+    notes: Model Watermarking、False Ownership Claims
+  
+  
+  # 模板 
+  #- title: Prompt-Based Exemplar Super-Compression and Regeneration for Class-Incremental Learning
+  #  authors: Ruxiao Duan, <strong>Yaoyao Liu<sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong>, Jieneng Chen, Adam Kortylewski, Alan Yuille  ( <sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)
+  #  conference_short: Preprint
+  #  conference: Under review.
+  #  pdf: https://arxiv.org/pdf/2311.18266.pdf
+  #  bibtex: https://dblp.uni-trier.de/rec/journals/corr/abs-2311-18266.html?view=bibtex
+  #  code: https://github.com/KerryDRX/ESCORT
+  #  image: https://img.yliu.me/arxiv_23_2.png

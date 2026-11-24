@@ -1,0 +1,479 @@
+---
+layout: project
+title: "少即是多：面向大语言模型的歧义感知动态水印"
+description: "AAW 是一种稀疏、歧义感知的大语言模型水印方法，在减少 38.4% 水印 token 的同时提升改写攻击下的检测能力。"
+permalink: /papers/less-is-more/zh/
+lang: zh-CN
+lang_switch_url: /papers/less-is-more/
+lang_switch_label: 切换至英文
+lang_switch_hreflang: en
+---
+
+<section class="pj-hero" id="overview">
+  <div class="pj-container">
+    <p class="pj-kicker">ACM MMAsia 2026 · 越南河内</p>
+    <h1 class="pj-title"><span class="pj-tp">少即是多：</span><span class="pj-tp">面向大语言模型的</span><span class="pj-tp">歧义感知动态水印</span></h1>
+
+    <p class="pj-authors">
+      Yutong Wu<sup>1,*</sup>, Li Zheng<sup>2,*</sup>,
+      <span class="pj-self">Wenyue Li</span><sup>3</sup>,
+      Hewang Nie<sup>4</sup>, Pingyi Hu<sup>1</sup>, Jianwei Li<sup>1</sup>,
+      Zili Li<sup>5</sup>, Xiaojing Ma<sup>1</sup>,
+      <strong>Songfeng Lu</strong><sup>1,✉</sup>
+    </p>
+    <p class="pj-affil">
+      <sup>1</sup> 华中科技大学 ·
+      <sup>2</sup> 武汉大学 ·
+      <sup>3</sup> 湖北宜化集团有限责任公司 ·
+      <sup>4</sup> 广西师范大学 ·
+      <sup>5</sup> 华中师范大学
+    </p>
+    <p class="pj-notes">* 共同第一作者。 &nbsp;✉ 通讯作者。</p>
+
+    <div class="pj-actions">
+      <a class="pj-btn pj-btn-primary" href="{{ '/assets/files/less-is-more-aaw-mmasia-2026.pdf' | relative_url }}" target="_blank" rel="noopener">PDF</a>
+      <a class="pj-btn" href="https://doi.org/10.1145/3862739.3863375" target="_blank" rel="noopener">DOI</a>
+      <a class="pj-btn" href="#citation">BibTeX</a>
+    </div>
+
+    <figure class="pj-hero-figure">
+      <a class="pj-figure-link" href="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" target="_blank" rel="noopener">
+        <img src="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" width="1950" height="1243" loading="eager" decoding="async" alt="AAW 总体框架">
+      </a>
+      <figcaption class="pj-caption">
+        <strong>图 3.</strong> AAW 总体框架。阶段 1 选择稀疏的高歧义位置并嵌入语义载荷；阶段 2 仅使用公开辅助模型进行检测；C 部分展示语义编码器与乘性 logit 调制。
+        <a href="{{ '/assets/img/papers/less-is-more/figure3-framework.png' | relative_url }}" target="_blank" rel="noopener">查看原图 ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-stats">
+      <div class="pj-stat">
+        <strong>38.7</strong>
+        <span>水印 token 数<br>对比仅熵门控的 62.8</span>
+      </div>
+      <div class="pj-stat">
+        <strong>+37</strong>
+        <span>检测分数<br>87.18 vs 未加水印 50.38</span>
+      </div>
+      <div class="pj-stat">
+        <strong>0.951</strong>
+        <span>ROC-AUC<br>GPT 改写攻击</span>
+      </div>
+      <div class="pj-stat">
+        <strong>7.66</strong>
+        <span>困惑度<br>对比 Adaptive 8.74</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pj-news-strip">
+  <div class="pj-container pj-news-inner">
+    <span class="pj-news-label">动态</span>
+    <span><strong>2026-11</strong> — 项目主页与论文 PDF 上线。</span>
+    <span><strong>2026-12</strong> — ACM MMAsia 2026，越南河内。</span>
+  </div>
+</div>
+
+<section class="pj-section" id="motivation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">动机</p>
+      <h2>熵不等于歧义。</h2>
+    </div>
+    <p class="pj-lead">
+      现有自适应水印根据预测熵决定嵌入位置。但熵同时混合了偶然不确定性——上下文本身的歧义——与<span class="pj-mark">认知不确定性</span>，后者反映的是模型“不知道”的部分。AAW 关注的是后者。
+    </p>
+
+    <div class="pj-grid-2">
+      <div>
+        <p>
+          在高歧义位置，预测熵反而<strong>更低</strong>（<span class="pj-key">2.04 vs 2.86</span>），而 Monte Carlo dropout 得到的歧义分数高出一个数量级（<span class="pj-mark">3.35e-7 vs 2.99e-8</span>）。因此，仅依赖熵的门控会错过最容易检测水印的位置。
+        </p>
+        <div class="pj-callout">
+          熵问的是“模型有多不确定”，歧义问的是“模型为什么不确定”。
+        </div>
+      </div>
+
+      <figure class="pj-figure">
+        <div class="pj-table-wrap">
+          <table class="pj-table pj-table-sm pj-table-numeric">
+            <thead>
+              <tr>
+                <th>位置</th>
+                <th>熵 ↓</th>
+                <th>Gini ↑</th>
+                <th>Top-1 概率 ↑</th>
+                <th>歧义度 ↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>高歧义</td>
+                <td>2.04</td>
+                <td>0.998</td>
+                <td>0.569</td>
+                <td><strong>3.35e-7</strong></td>
+              </tr>
+              <tr>
+                <td>低歧义</td>
+                <td>2.86</td>
+                <td>0.995</td>
+                <td>0.453</td>
+                <td>2.99e-8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figcaption>
+          <strong>表 1（节选）。</strong> 高歧义位置并不是高熵位置。完整表格见论文。
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="highlights">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">亮点</p>
+      <h2>AAW 有效的四个原因。</h2>
+    </div>
+    <p class="pj-lead">
+      AAW 不是嵌得更多，而是嵌在模型真正歧义的位置，并用能抵抗改写的语义载荷承载水印。
+    </p>
+
+    <div class="pj-highlight-grid">
+      <article class="pj-highlight-card pj-hl-pink">
+        <p class="pj-hl-label">亮点 1</p>
+        <h3>稀疏，而非密集</h3>
+        <p>AAW 只选择同时通过熵门控与歧义门控的位置，而不是对所有低熵 token 嵌入水印。</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl1-tokens.png' | relative_url }}" alt="图 1：AAW 仅需 38.7 个水印 token，而仅熵门控需要 62.8 个" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>38.7</strong> 个水印 token，对比仅熵门控 62.8</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-amber">
+        <p class="pj-hl-label">亮点 2</p>
+        <h3>歧义，而非熵</h3>
+        <p>高歧义位置的预测熵更低，但 Monte Carlo 歧义分数高出一个数量级。</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl2-ambiguity.png' | relative_url }}" alt="图 3 阶段 1：熵预筛选与歧义定位" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>2.04</strong> 熵 vs 2.86 &middot; <strong>3.35e-7</strong> 歧义度 vs 2.99e-8</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-green">
+        <p class="pj-hl-label">亮点 3</p>
+        <h3>质量与鲁棒性兼得</h3>
+        <p>AAW 的困惑度更接近未加水印模型，同时在改写攻击下取得更好的排序。</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl3-roc.png' | relative_url }}" alt="图 4：GPT 改写攻击下的 ROC 曲线，AAW 达到 0.951 AUC" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>0.951</strong> GPT 改写 ROC-AUC &middot; <strong>7.66</strong> PPL vs 8.74</p>
+      </article>
+
+      <article class="pj-highlight-card pj-hl-blue">
+        <p class="pj-hl-label">亮点 4</p>
+        <h3>检测保持公开</h3>
+        <p>检测端只需要公开辅助模型与 SP-Net，不需要访问私有 LLM。</p>
+        <div class="pj-hl-media">
+          <img src="{{ '/assets/img/papers/less-is-more/hl4-detection.png' | relative_url }}" alt="图 3 阶段 2：使用公开辅助模型与 SP-Net 的模型无关检测" loading="lazy" decoding="async">
+        </div>
+        <p class="pj-hl-metric"><strong>0</strong> 次私有 LLM 调用 &middot; 仅公开 MM + SP-Net</p>
+      </article>
+    </div>
+
+    <ul class="pj-highlight-list">
+      <li><strong>水印 token 减少 38.4%</strong> — 38.7 vs 62.8，同时检测更强。</li>
+      <li><strong>检测分数 +37</strong> — 87.18 vs 未加水印 50.38。</li>
+      <li><strong>0.951 ROC-AUC</strong> — GPT-3.5 改写攻击下，对比 Adaptive 0.918、KGW 0.883、MorphMark 0.838。</li>
+      <li><strong>文本质量优于 Adaptive</strong> — PPL 7.66 vs 8.74，Log Div 10.67 vs 7.95。</li>
+      <li><strong>检测不需要私有模型</strong> — 仅使用公开辅助 MM 与 SP-Net。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="method">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">方法</p>
+      <h2>少嵌水印，嵌在关键位置。</h2>
+    </div>
+    <p class="pj-lead">
+      AAW 由层级门控、语义载荷与质量保持调制组成。检测端不需要访问私有 LLM。
+    </p>
+
+    <figure class="pj-figure">
+      <div class="pj-figure-scroll">
+        <a class="pj-figure-link" href="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" target="_blank" rel="noopener">
+          <img src="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" width="1500" height="504" decoding="async" alt="AAW 阶段 1：熵预筛选与歧义定位">
+        </a>
+      </div>
+      <figcaption>
+        <strong>阶段 1.</strong> 熵预筛选（B.1）先筛选候选位置；Monte Carlo dropout 估计认知不确定性（B.2），并定位稀疏的水印位置。
+        <a href="{{ '/assets/img/papers/less-is-more/stage1-gating.png' | relative_url }}" target="_blank" rel="noopener">查看原图 ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-steps">
+      <article class="pj-step-card">
+        <div class="pj-step-num">1</div>
+        <h3>在哪里：熵预筛选 → 歧义定位</h3>
+        <p>
+          公开辅助模型计算预测熵，只有低熵候选通过。随后对每个候选执行 N = 8 次 Monte Carlo dropout，估计认知不确定性；歧义度高于 τ<sub>A</sub> 的位置被保留。仅当两个条件同时满足时，门控 g<sub>t</sub> 为 1。
+        </p>
+        <p class="pj-small">结果：38.7 个水印 token，比仅熵门控（62.8）少 38.4%。</p>
+      </article>
+
+      <article class="pj-step-card">
+        <div class="pj-step-num">2</div>
+        <h3>嵌什么：语义载荷 + 乘性调制</h3>
+        <p>
+          Sentence-BERT 编码器与 SP-Net 将局部上下文映射为二进制载荷 q<sub>t</sub>。在选中的位置，AAW 对原始 logits 进行缩放。由于调制是乘性的，它保持了下一个 token 分布的形状。
+        </p>
+        <div class="pj-formula">L′<sub>t</sub> = L<sub>t</sub> ⊙ (1 + g<sub>t</sub> · δ · q<sub>t</sub>), &nbsp; δ = 0.5</div>
+      </article>
+
+      <article class="pj-step-card">
+        <div class="pj-step-num">3</div>
+        <h3>如何检测：模型无关检测</h3>
+        <p>
+          检测端只需要公开辅助 MM 与 SP-Net。它从文本中重新识别候选位置，重建载荷并统计匹配数 k。对零假设做 z 检验即可得到最终判断——无需访问私有 LLM。
+        </p>
+        <div class="pj-formula">z = (k − m/2) / √(m/4)</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="results">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">结果</p>
+      <h2>更强的检测，更好的文本。</h2>
+    </div>
+    <p class="pj-lead">
+      我们在 Llama-7B 与 OPT-1.3B 上评估。表 2 报告 Llama-7B 的结果；完整论文包含两个模型和更全面的攻击测试。
+    </p>
+
+    <div class="pj-table-wrap">
+      <table class="pj-table pj-table-numeric">
+        <thead>
+          <tr>
+            <th>方法</th>
+            <th>PPL ↓</th>
+            <th>词汇多样性 ↑</th>
+            <th>删除攻击 AUC ↑</th>
+            <th>同义替换 AUC ↑</th>
+            <th>ROC-AUC ↑</th>
+            <th>最佳 F1 ↑</th>
+            <th>TPR@1% ↑</th>
+            <th>TPR@5% ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>未加水印</td>
+            <td>6.44 ± 1.45</td>
+            <td>11.70 ± 4.77</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>KGW</td>
+            <td>6.58 ± 1.54</td>
+            <td>10.44 ± 3.92</td>
+            <td>0.9991</td>
+            <td>0.9852</td>
+            <td>0.8835</td>
+            <td>0.8177</td>
+            <td>0.4200</td>
+            <td>0.5500</td>
+          </tr>
+          <tr>
+            <td>MorphMark</td>
+            <td>5.78 ± 1.53</td>
+            <td>10.18 ± 3.69</td>
+            <td>0.9930</td>
+            <td>0.9746</td>
+            <td>0.8882</td>
+            <td>0.7945</td>
+            <td>0.8000</td>
+            <td>0.4200</td>
+          </tr>
+          <tr>
+            <td>Adaptive</td>
+            <td>8.74 ± 2.00</td>
+            <td>7.95 ± 2.46</td>
+            <td>0.9998</td>
+            <td>1.0000</td>
+            <td>0.7927</td>
+            <td>0.9246</td>
+            <td>0.8400</td>
+            <td>0.9000</td>
+          </tr>
+          <tr class="pj-highlight">
+            <td>AAW（本文）</td>
+            <td>7.66 ± 1.59</td>
+            <td>10.67 ± 4.80</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>0.9511</td>
+            <td>0.8335</td>
+            <td>0.7900</td>
+            <td>0.8600</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pj-small" style="margin-top:10px;">
+      <strong>表 2.</strong> Llama-7B 上的质量–鲁棒性权衡。AAW 取得最佳 ROC-AUC 与接近完美的删除/同义替换 AUC，同时困惑度和词汇多样性比 Adaptive 更接近未加水印模型。Adaptive 在严格低 FPR 工作点上仍更强（TPR@1%：0.840 vs 0.790）。
+    </p>
+
+    <h3 style="margin-top:44px;">少即是多</h3>
+    <figure class="pj-figure pj-figure-narrow">
+      <img src="{{ '/assets/img/papers/less-is-more/figure1-token-counts.png' | relative_url }}" width="1018" height="459" loading="lazy" decoding="async" alt="不同门控策略的水印 token 数">
+      <figcaption>
+        <strong>图 1.</strong> 不同门控策略所需的水印 token 数。AAW11 仅需 38.7 个 token，而仅熵门控的 AAW10 需要 62.8 个。
+      </figcaption>
+    </figure>
+    <figure class="pj-figure pj-figure-narrow" style="margin-top:24px;">
+      <img src="{{ '/assets/img/papers/less-is-more/figure2-score-distributions.png' | relative_url }}" width="1022" height="514" loading="lazy" decoding="async" alt="不同门控策略的检测分数分布">
+      <figcaption>
+        <strong>图 2.</strong> 检测分数分布。AAW11 的平均分数为 87.18，比未加水印的 50.38 高约 37 分。
+      </figcaption>
+    </figure>
+
+    <h3 style="margin-top:44px;">对改写更鲁棒</h3>
+    <figure class="pj-figure pj-figure-narrow">
+      <img src="{{ '/assets/img/papers/less-is-more/figure4-roc-paraphrase.png' | relative_url }}" width="1026" height="780" loading="lazy" decoding="async" alt="GPT 改写攻击下的 ROC 曲线">
+      <figcaption>
+        <strong>图 4.</strong> GPT-3.5 改写攻击下的 ROC 曲线。AAW11 达到 0.951 AUC，高于 Adaptive（0.918）、KGW（0.883）与 MorphMark（0.838）。
+      </figcaption>
+    </figure>
+
+    <h3 style="margin-top:44px;">在完整攻击集上</h3>
+    <figure class="pj-figure">
+      <img src="{{ '/assets/img/papers/less-is-more/figure5-roc-suite.png' | relative_url }}" width="1030" height="539" loading="lazy" decoding="async" alt="四种门控变体在八种攻击下的 ROC 曲线">
+      <figcaption>
+        <strong>图 5.</strong> 四种 AAW 门控变体在八种无目标攻击下的 ROC 曲线。熵门控有助于强删除攻击，歧义门控是改写鲁棒性的主要来源；AAW11 同时使用两者。
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="pj-section" id="ablation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">消融</p>
+      <h2>两个门控都重要。</h2>
+    </div>
+    <p class="pj-lead">
+      去掉任一 gate 都会变差。AAW00 不使用门控，AAW01 只使用歧义，AAW10 只使用熵，AAW11 同时使用两者。歧义门控是改写鲁棒性的主要来源，熵门控在强删除攻击下尤其有用。
+    </p>
+
+    <div class="pj-grid-2">
+      <div class="pj-table-wrap">
+        <table class="pj-table pj-table-sm pj-table-numeric">
+          <thead>
+            <tr>
+              <th>变体</th>
+              <th>熵门控</th>
+              <th>歧义门控</th>
+              <th>改写 AUC ↑</th>
+              <th>组合攻击 AUC ↑</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AAW00</td>
+              <td>—</td>
+              <td>—</td>
+              <td>0.883</td>
+              <td>0.863</td>
+            </tr>
+            <tr>
+              <td>AAW01</td>
+              <td>—</td>
+              <td>✓</td>
+              <td>0.944</td>
+              <td>0.871</td>
+            </tr>
+            <tr>
+              <td>AAW10</td>
+              <td>✓</td>
+              <td>—</td>
+              <td>0.918</td>
+              <td>0.892</td>
+            </tr>
+            <tr class="pj-highlight">
+              <td>AAW11</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>0.951</td>
+              <td>0.932</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pj-card">
+        <h3>消融说明了什么</h3>
+        <p>
+          仅歧义 AAW01 将改写 AUC 从 0.883 提升到 0.944；仅熵 AAW10 将组合攻击 AUC 从 0.863 提升到 0.892。两者结合在两个指标上都最好：<strong>改写 AUC 0.951</strong> 与 <strong>组合攻击 AUC 0.932</strong>。
+        </p>
+        <p class="pj-small">
+          AAW11 使用 38.7 个 token，而 AAW10 使用 62.8 个，因此提升并不是靠更密集的水印换来的。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="conclusion">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">结论</p>
+      <h2>选对位置，少即是多。</h2>
+    </div>
+    <p class="pj-lead">
+      AAW 把“嵌得更多”换成“嵌在关键位置”：稀疏的高歧义位置、语义载荷与公开检测器。结果是更少的水印 token、更好的文本质量，以及更强的改写鲁棒性。
+    </p>
+    <div class="pj-callout">
+      <strong>局限性。</strong> Monte Carlo dropout 带来额外推理开销（每个候选 N = 8 次前向）。降低这部分成本是自然的下一步。
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="citation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">引用</p>
+      <h2>引用本文。</h2>
+    </div>
+    <p class="pj-lead">如果本研究对你有帮助，欢迎引用：</p>
+
+    <div class="pj-citation-wrap">
+      <button class="pj-copy-btn" type="button" data-copy="#bibtex">复制</button>
+      <pre class="pj-citation" id="bibtex">@inproceedings{wu2026less,
+  author    = {Yutong Wu and Li Zheng and Wenyue Li and Hewang Nie and Pingyi Hu and Jianwei Li and Zili Li and Xiaojing Ma and Songfeng Lu},
+  title     = {Less is More: Ambiguity-Aware Dynamic Watermarking for Large Language Models},
+  booktitle = {Proceedings of the ACM Multimedia Asia (MMAsia '26)},
+  year      = {2026},
+  address   = {Hanoi, Vietnam},
+  publisher = {ACM},
+  doi       = {10.1145/3862739.3863375}
+}</pre>
+    </div>
+
+    <p class="pj-small" style="margin-top:14px;">
+      DOI: <a href="https://doi.org/10.1145/3862739.3863375" target="_blank" rel="noopener">10.1145/3862739.3863375</a>
+    </p>
+  </div>
+</section>
