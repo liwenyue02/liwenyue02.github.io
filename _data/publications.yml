@@ -1,6 +1,6 @@
 main:
 
-  - title: Multi-period mean-variance portfolio optimization with capital injections
+  - title: Multi-period mean–variance portfolio optimization with capital injections
     category: Journal
     date: "2025"
     authors: Longyu Shi, Yunyun Wang, Wenyue Li, <strong>Zhimin Zhang <sup><i class="fa-regular fa-envelope fa-xs"></i></sup></strong> <span class="author-note">(<sup><i class="fa-regular fa-envelope fa-xs"></i></sup> Corresponding author)</span>
@@ -9,8 +9,8 @@ main:
     pdf: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
     HTML: https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424
     others: 'DOI: <a href="https://doi.org/10.1016/j.matcom.2025.02.006" target="_blank" rel="noopener">10.1016/j.matcom.2025.02.006</a>'
-    image: /assets/img/pub/portfolio-cimv.jpg
-    hero_image: /assets/img/pub/portfolio-cimv-hero.jpg
+    image: /assets/img/papers/portfolio-cimv/framework-card.jpg
+    hero_image: /assets/img/papers/portfolio-cimv/hero-framework.jpg
     slug: portfolio-cimv
     project: /papers/portfolio-cimv/
     figure_caption: "Graphical abstract: the CIMV model, fused Lasso regularization, ADMM solver, and empirical performance."

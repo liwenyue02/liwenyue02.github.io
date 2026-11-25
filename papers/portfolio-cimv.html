@@ -1,0 +1,599 @@
+---
+layout: project
+title: "Multi-period Mean–Variance Portfolio Optimization with Capital Injections"
+description: "CIMV injects capital across periods under a fused-Lasso mean–variance model, solved by a provably convergent two-block ADMM, cutting portfolio variance up to 8.06x versus the classic lump-sum model."
+permalink: /papers/portfolio-cimv/
+lang: en
+lang_switch_url: /papers/portfolio-cimv/zh/
+lang_switch_label: 切换至中文
+lang_switch_hreflang: zh-CN
+extra_css: /assets/css/portfolio.css
+extra_js: /assets/js/portfolio.js
+footer_note: "© 2025 Wenyue Li · Mathematics and Computers in Simulation 233:400–412"
+nav_links:
+  - label: Overview
+    href: "#overview"
+  - label: Approach
+    href: "#approach"
+  - label: How it works
+    href: "#howitworks"
+  - label: Experiments
+    href: "#experiments"
+  - label: Results
+    href: "#results"
+  - label: Takeaways
+    href: "#takeaways"
+  - label: Citation
+    href: "#citation"
+---
+
+<section class="pj-hero" id="overview">
+  <div class="pj-container">
+    <p class="pj-kicker">Mathematics and Computers in Simulation · 2025 · 233:400–412</p>
+    <h1 class="pj-title">Multi-period Mean–Variance Portfolio Optimization with Capital Injections</h1>
+
+    <p class="pj-authors">
+      Longyu Shi<sup>1</sup>, Yunyun Wang<sup>2,3</sup>,
+      <span class="pj-self">Wenyue Li</span><sup>1</sup>,
+      <strong>Zhimin Zhang</strong><sup>1,✉</sup>
+    </p>
+    <p class="pj-affil">
+      <sup>1</sup> College of Mathematics and Statistics, Chongqing University ·
+      <sup>2</sup> Department of Finance and Statistics, Hunan University ·
+      <sup>3</sup> Department of Econometrics and Business Statistics, Monash University
+    </p>
+    <p class="pj-notes">✉ Corresponding author.</p>
+
+    <div class="pj-actions">
+      <a class="pj-btn pj-btn-primary" href="https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424" target="_blank" rel="noopener">Paper</a>
+      <a class="pj-btn" href="https://doi.org/10.1016/j.matcom.2025.02.006" target="_blank" rel="noopener">DOI</a>
+      <a class="pj-btn" href="#citation">BibTeX</a>
+    </div>
+
+    <figure class="pj-hero-figure">
+      <a class="pj-figure-link" href="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" target="_blank" rel="noopener">
+        <img src="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" width="1800" height="983" loading="eager" decoding="async" alt="Graphical abstract of the CIMV model: periodic capital injections, fused Lasso penalties, ADMM solver, and empirical results">
+      </a>
+      <figcaption class="pj-caption">
+        <strong>Graphical abstract.</strong> CIMV couples periodic capital injections with fused-Lasso penalties and a two-block ADMM solver. The right panel summarizes the empirical payoff: a higher risk-reduction ratio, controlled holding and trading costs, and a higher information ratio than the classic model.
+        <a href="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" target="_blank" rel="noopener">Open full figure ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-stats">
+      <div class="pj-stat">
+        <strong>8.06×</strong>
+        <span>variance-reduction ratio<br>vs 5.92 for the classic model</span>
+      </div>
+      <div class="pj-stat">
+        <strong>0.8913</strong>
+        <span>best information ratio<br>vs 0.7506 classic at the same target</span>
+      </div>
+      <div class="pj-stat">
+        <strong>6</strong>
+        <span>rebalancing periods<br>over 83 FTSE 100 stocks</span>
+      </div>
+      <div class="pj-stat">
+        <strong>2</strong>
+        <span>real datasets<br>FTSE 100 and FF49 industry portfolios</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pj-news-strip">
+  <div class="pj-container pj-news-inner">
+    <span class="pj-news-label">News</span>
+    <span><strong>2025-02</strong> — Published in Mathematics and Computers in Simulation, 233:400–412.</span>
+    <span><strong>2025</strong> — JCR Q1, CAS Zone 2.</span>
+  </div>
+</div>
+
+<section class="pj-section" id="abstract">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Abstract</p>
+      <h2>Invest a little now, inject the rest later.</h2>
+    </div>
+    <p class="pj-lead">
+      We study portfolio optimization where investors allocate part of their capital across a large asset pool first, then inject the remaining capital gradually over subsequent periods. The proposed multi-period mean–variance model builds a sparse long-term strategy in this setting: a fused-Lasso formulation with two ℓ<sub>1</sub> penalties lowers both holding and trading costs, and a two-block alternating direction method of multipliers solves the resulting non-smooth, multi-variable program with a full convergence analysis. Experiments on two real datasets confirm the practical benefit.
+    </p>
+    <ul class="pm-kw">
+      <li>Portfolio optimization</li>
+      <li>Multi-period</li>
+      <li>Capital injection</li>
+      <li>Fused Lasso</li>
+      <li>ADMM</li>
+      <li>Sparsity</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="approach">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Approach</p>
+      <h2>An overview of CIMV.</h2>
+    </div>
+    <p class="pj-lead">
+      Most multi-period models assume a single lump-sum investment. That overlooks dollar-cost averaging and value averaging, where capital arrives in instalments — and it ignores the two costs that dominate a long-horizon book: holding and trading.
+    </p>
+
+    <figure class="pj-figure pj-figure-wide" style="margin-top: 26px;">
+      <img src="{{ '/assets/img/papers/portfolio-cimv/framework-card.jpg' | relative_url }}" width="770" height="602" loading="eager" decoding="async" alt="Overview of the CIMV model: initial investment, periodic capital injections, fused-Lasso penalty terms, sparse portfolios, and the ADMM solver">
+      <figcaption>
+        <strong>Overview.</strong> Capital enters in instalments, two fused-Lasso penalties control holding and trading costs, and a two-block ADMM solves the resulting program.
+      </figcaption>
+    </figure>
+
+    <div class="pj-grid-2" style="margin-top: 28px;">
+      <div class="pj-card">
+        <h3>Holding cost</h3>
+        <p class="pj-small">
+          Every name you keep must be monitored, reported, and financed. Penalizing <span class="pj-key">‖w<sub>j</sub>‖<sub>1</sub></span> pushes the optimizer toward a <span class="pj-mark">sparse</span> portfolio, so capital concentrates in fewer, better-understood positions.
+        </p>
+      </div>
+      <div class="pj-card">
+        <h3>Trading cost</h3>
+        <p class="pj-small">
+          Frequent rebalancing churns the book. Penalizing <span class="pj-key">‖w<sub>j+1</sub> − w<sub>j</sub>‖<sub>1</sub></span> keeps weights <span class="pj-mark">stable</span> from one period to the next, which lowers turnover and preserves allocation intent.
+        </p>
+      </div>
+    </div>
+
+    <p class="pj-lead" style="margin-top: 30px;">
+      Let <span class="pm-var">w</span> stack the weights of all <span class="pj-key">m</span> periods and <span class="pm-var">p</span> the injected amounts. The compact form of the capital-injection mean–variance (CIMV) model is a quadratic objective with two ℓ<sub>1</sub> terms and linear wealth dynamics.
+    </p>
+
+    <div class="pm-eq">
+      <div class="pm-eq-body">
+        min<sub>w, p</sub> &nbsp; ½ w<sup>⊤</sup>Σw + λ<sub>1</sub>‖w‖<sub>1</sub> + λ<sub>2</sub>‖Fw‖<sub>1</sub>
+        <br>
+        s.t. &nbsp; Ew − p = y<sub>1</sub>, &nbsp; H<sub>1</sub>p = y<sub>2</sub>, &nbsp; p ≥ 0, &nbsp; Gw − H<sub>2</sub>p ≥ w<sub>min</sub>
+      </div>
+      <p class="pm-eq-cap">
+        <strong>Eq. (7) in the paper.</strong> Σ is the return covariance matrix; F is the first-difference matrix that measures weight changes between consecutive periods; E, G encode wealth evolution; H<sub>1</sub>, H<sub>2</sub> encode the injection budget and the minimum-wealth floor.
+      </p>
+    </div>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      Click a card to flip it and see what each piece means in plain English.
+    </p>
+
+    <div class="pm-flip-grid">
+      <div class="pm-flip" role="button" tabindex="0" aria-label="Flip to see wealth dynamics">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">1</span> Wealth dynamics</h3>
+            <div class="pm-flip-front-body">1<sub>n</sub>w<sub>1</sub> = ξ<sub>init</sub><br>1<sub>n</sub>w<sub>j</sub> = (1<sub>n</sub> + r<sub>j−1</sub><sup>⊤</sup>)w<sub>j−1</sub> + p<sub>j−1</sub></div>
+            <span class="pm-flip-hint">Click →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">1</span> Wealth dynamics</h3>
+            <p>
+              Initial wealth finances the first portfolio; afterwards each period starts from the previous book plus its return plus the new injection <strong>p<sub>j−1</sub></strong>.
+            </p>
+            <span class="pm-flip-hint">← Click again</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-flip" role="button" tabindex="0" aria-label="Flip to see holding sparsity">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">2</span> Holding sparsity</h3>
+            <div class="pm-flip-front-body">λ<sub>1</sub> Σ<sub>j=1…m</sub> ‖w<sub>j</sub>‖<sub>1</sub></div>
+            <span class="pm-flip-hint">Click →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">2</span> Holding sparsity</h3>
+            <p>
+              The first ℓ<sub>1</sub> term shrinks the number of active positions, so capital stays in a smaller, more legible set of assets.
+            </p>
+            <span class="pm-flip-hint">← Click again</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-flip" role="button" tabindex="0" aria-label="Flip to see trading stability">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">3</span> Trading stability</h3>
+            <div class="pm-flip-front-body">λ<sub>2</sub> Σ<sub>j=1…m−1</sub> ‖w<sub>j+1</sub> − w<sub>j</sub>‖<sub>1</sub></div>
+            <span class="pm-flip-hint">Click →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">3</span> Trading stability</h3>
+            <p>
+              The second ℓ<sub>1</sub> term penalizes weight drift, turning the fused-Lasso structure into a direct control on turnover.
+            </p>
+            <span class="pm-flip-hint">← Click again</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="pm-constraints">
+      <li><strong>Injection budget.</strong> Capital is injected over the first <code>t</code> periods and discounted at the risk-free rate; the remainder waits in the risk-free asset.</li>
+      <li><strong>Non-negativity.</strong> <code>p ≥ 0</code> — injections are one-directional, so the model does not allow withdrawing capital mid-horizon.</li>
+      <li><strong>Wealth floor.</strong> Expected wealth in every period must beat the naive 1/n benchmark.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="howitworks">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">How it works</p>
+      <h2>A two-block ADMM that provably converges.</h2>
+    </div>
+    <p class="pj-lead">
+      CIMV has five separable blocks. A direct multi-block ADMM is not guaranteed to converge, so we use the prediction–correction scheme of He et al.: a Gauss–Seidel prediction step followed by a relaxation correction with parameter ν ∈ (0, 1).
+    </p>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      Hover any tile to zoom it and expand the detail — the three update rules live inside one short loop.
+    </p>
+
+    <div class="pm-fb-grid">
+      <div class="pm-fb teal" tabindex="0" role="group" aria-label="ADMM Gauss–Seidel prediction step">
+        <div class="pm-fb-label">Step 1 · ADMM iterate</div>
+        <div class="pm-fb-title">Predict, block by block</div>
+        <div class="pm-fb-eq">w̃<sub>k</sub> = D<sub>1</sub>λ<sub>k</sub><br>D<sub>1</sub> = (Σ + βA<sub>1</sub><sup>⊤</sup>A<sub>1</sub>)<sup>−1</sup>A<sub>1</sub><sup>⊤</sup></div>
+        <div class="pm-fb-detail">
+          The <strong>w̃</strong>-update is one linear solve with a matrix that is fixed across iterations, so we precompute its inverse by Cholesky. Every other block — <strong>p̃</strong>, <strong>ã</strong>, <strong>b̃</strong>, <strong>c̃</strong> — uses a closed-form proximal map.
+        </div>
+      </div>
+
+      <div class="pm-fb amber" tabindex="0" role="group" aria-label="Soft-threshold proximal operator">
+        <div class="pm-fb-label">Step 2 · Soft-threshold</div>
+        <div class="pm-fb-title">Both ℓ<sub>1</sub> penalties share one proximal operator</div>
+        <div class="pm-fb-eq">û<sub>i</sub> = sign(v<sub>i</sub>) · max{0, |v<sub>i</sub>| − λ/μ}</div>
+        <div class="pm-fb-detail">
+          Every non-smooth piece — the holding penalty λ<sub>1</sub>‖w‖<sub>1</sub> and the trading penalty λ<sub>2</sub>‖Fw‖<sub>1</sub> — reduces to the same componentwise soft-threshold, cheap and exact.
+        </div>
+      </div>
+
+      <div class="pm-fb blue" tabindex="0" role="group" aria-label="Relaxation correction and convergence">
+        <div class="pm-fb-label">Step 3 · Relax + convergence</div>
+        <div class="pm-fb-title">Correct and relax to restore contraction</div>
+        <div class="pm-fb-eq">ξ<sub>k+1</sub> = ξ<sub>k</sub> − N(ξ<sub>k</sub> − ξ̃<sub>k</sub>)</div>
+        <div class="pm-fb-detail">
+          Predicted values are relaxed by ν ∈ (0, 1) before the next iterate. This is what makes the direct multi-block ADMM — which does not converge on its own — recover the contraction property; the merit function ‖ξ<sup>k</sup> − ξ*‖<sub>H</sub> decreases monotonically.
+        </div>
+      </div>
+    </div>
+
+    <p class="pm-note">
+      Per iteration cost: one matrix–vector product for <strong>w</strong>, a soft-threshold for each ℓ<sub>1</sub> block, and one trivial update for the dual variable λ — well within reach for 83 assets × 6 periods.
+    </p>
+
+    <div class="pm-converge">
+      <span class="pm-converge-tag">Proposition A.1</span>
+      <p>
+        <strong>Convergence.</strong> Let {v<sup>k</sup>} be the sequence generated by the algorithm. With H and Q positive definite, the merit function ‖ξ<sup>k</sup> − ξ*‖<sub>H</sub> decreases monotonically and ‖ξ<sup>k</sup> − ξ̃<sup>k</sup>‖<sub>Q</sub> → 0, so the sequence converges to an optimal solution point v*.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="experiments">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Experiments</p>
+      <h2>Two real datasets, two horizons.</h2>
+    </div>
+    <p class="pj-lead">
+      Both datasets come from the Fama–French library. The injection process starts in the second period and continues through the latter half of the horizon; the 1/n naive strategy, which spreads all available wealth evenly, is the baseline throughout.
+    </p>
+
+    <div class="pm-datasets">
+      <div class="pm-dataset">
+        <h3><span class="pm-tag">FTSE 100</span> UK large-cap index</h3>
+        <ul class="pm-spec">
+          <li><b>83</b> stocks</li>
+          <li><b>Weekly</b> returns</li>
+          <li><b>2002-07 → 2016-04</b></li>
+          <li><b>m = 6</b> quarters</li>
+        </ul>
+        <p>Tests whether the model tracks a broad national index while managing holding and trading costs across quarterly rebalancing.</p>
+      </div>
+      <div class="pm-dataset">
+        <h3><span class="pm-tag">FF49</span> US industry portfolios</h3>
+        <ul class="pm-spec">
+          <li><b>49</b> sectors</li>
+          <li><b>Monthly</b> returns</li>
+          <li><b>30-year</b> window</li>
+          <li><b>m = 5 / 10</b></li>
+        </ul>
+        <p>Uses the most recent 30 years with a 5-year rolling window, comparing the injection model (6) directly against the lump-sum model (5).</p>
+      </div>
+    </div>
+
+    <div class="pm-metrics">
+      <div class="pm-metric">
+        <strong>Ratio</strong>
+        <span>naive risk ÷ optimal risk; above 1 means the optimal book is safer.</span>
+      </div>
+      <div class="pm-metric">
+        <strong>Density</strong>
+        <span>share of non-zero weights; a proxy for holding cost.</span>
+      </div>
+      <div class="pm-metric">
+        <strong>T</strong>
+        <span>weight changes relative to the naive strategy; a proxy for transaction cost.</span>
+      </div>
+      <div class="pm-metric">
+        <strong>IR</strong>
+        <span>average excess return per unit of excess-return volatility.</span>
+      </div>
+    </div>
+
+    <p class="pm-note">
+      Parameter sweep: 20 values of τ<sub>1</sub> on [10<sup>−5</sup>, 10<sup>−4</sup>] and 20 values of τ<sub>2</sub> on [10<sup>−4</sup>, 10<sup>−3</sup>]; financial targets l<sub>s</sub>, l<sub>c</sub> ∈ {0.3, 0.4, 0.5, 0.6}, with tolerances tol<sub>s</sub> and tol<sub>c</sub>.
+    </p>
+  </div>
+</section>
+
+<section class="pj-section" id="results">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Results</p>
+      <h2>Lower risk at a controlled cost.</h2>
+    </div>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      Switch tabs to compare each experiment arm side by side. The figure strip in the last tab keeps all four behavioural plots in one row.
+    </p>
+
+    <div class="pm-tabs">
+      <div class="pm-tabs-header">
+        <button class="pm-tab-btn is-active" data-tab="ftse">FTSE 100</button>
+        <button class="pm-tab-btn" data-tab="ff49-m5">FF49 · m = 5</button>
+        <button class="pm-tab-btn" data-tab="ff49-m10">FF49 · m = 10</button>
+        <button class="pm-tab-btn" data-tab="ff49-evolution">Asset Behaviour</button>
+      </div>
+
+      <!-- ============ PANEL 1: FTSE 100 ============ -->
+      <div class="pm-tab-panel is-active" data-panel="ftse">
+        <div class="pm-subhead">
+          <h3>FTSE 100</h3>
+          <span>83 stocks · six quarters · risk reduction stays above 3.45×</span>
+        </div>
+
+        <div class="pm-fig-pair">
+          <figure class="pj-figure">
+            <div class="pj-table-wrap">
+              <table class="pj-table pj-table-sm pj-table-numeric">
+                <thead>
+                  <tr>
+                    <th>l<sub>s</sub></th>
+                    <th>l<sub>c</sub></th>
+                    <th>τ<sub>1</sub></th>
+                    <th>τ<sub>2</sub></th>
+                    <th>IR</th>
+                    <th>Ratio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>0.3</td><td>0.3</td><td>1.90E−05</td><td>4.60E−05</td><td>0.6138</td><td><strong>29.69</strong></td></tr>
+                  <tr><td>0.4</td><td>0.4</td><td>1.50E−05</td><td>7.30E−05</td><td>0.8805</td><td><strong>26.63</strong></td></tr>
+                  <tr><td>0.5</td><td>0.5</td><td>7.30E−05</td><td>4.15E−04</td><td>0.4910</td><td><strong>8.51</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption><strong>Table 1.</strong> CIMV under different financial targets. Risk reduction is large in every case and IR stays above 0.49.</figcaption>
+          </figure>
+
+          <figure class="pj-figure">
+            <div class="pj-table-wrap">
+              <table class="pj-table pj-table-sm pj-table-numeric">
+                <thead>
+                  <tr>
+                    <th>τ<sub>1</sub></th>
+                    <th>τ<sub>2</sub></th>
+                    <th>Density (%)</th>
+                    <th>T (%)</th>
+                    <th>Ratio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>10<sup>−3</sup></td><td>10<sup>−3</sup></td><td>28.92</td><td>4.10</td><td>3.81</td></tr>
+                  <tr><td>10<sup>−3</sup></td><td>10<sup>−4</sup></td><td>29.92</td><td>6.27</td><td>3.83</td></tr>
+                  <tr><td>10<sup>−4</sup></td><td>10<sup>−3</sup></td><td>30.32</td><td>6.99</td><td>3.52</td></tr>
+                  <tr><td>10<sup>−4</sup></td><td>10<sup>−4</sup></td><td>30.12</td><td>7.95</td><td><strong>3.45</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption><strong>Table 2.</strong> Larger penalties lower density and turnover; the risk ratio never drops below 3.45.</figcaption>
+          </figure>
+        </div>
+
+        <figure class="pj-figure" style="margin-top: 26px;">
+          <div class="pj-table-wrap" style="background: transparent; border: 0;">
+            <img src="{{ '/assets/img/papers/portfolio-cimv/fig1-wealth.png' | relative_url }}" width="1672" height="1411" loading="eager" decoding="async" alt="Wealth at rebalancing dates for FTSE 100">
+          </div>
+          <figcaption>
+            <strong>Figure 1.</strong> Wealth at rebalancing dates versus the naive strategy for (l<sub>s</sub>, l<sub>c</sub>) = (0.3, 0.3), (0.4, 0.4), (0.5, 0.5). Optimal wealth (star) clears the minimum-wealth floor (triangle); injections become more gradual in later periods.
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- ============ PANEL 2: FF49 · m = 5 ============ -->
+      <div class="pm-tab-panel" data-panel="ff49-m5">
+        <div class="pm-subhead">
+          <h3>FF49 · m = 5</h3>
+          <span>Cross-target comparison against the classic lump-sum model</span>
+        </div>
+
+        <figure class="pj-figure" style="margin-top: 18px;">
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>l<sub>s</sub></th>
+                  <th>l<sub>c</sub></th>
+                  <th>CIMV Ratio</th>
+                  <th>CIMV IR</th>
+                  <th>Classic Ratio</th>
+                  <th>Classic IR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0.4</td><td>0.4</td><td>7.23</td><td>0.7215</td><td>5.28</td><td>0.7094</td></tr>
+                <tr><td>0.4</td><td>0.5</td><td>7.21</td><td>0.7384</td><td>4.93</td><td>0.7149</td></tr>
+                <tr><td>0.4</td><td>0.6</td><td>7.21</td><td>0.7384</td><td>4.93</td><td>0.7149</td></tr>
+                <tr><td>0.5</td><td>0.4</td><td>7.78</td><td>0.7266</td><td>5.56</td><td>0.7232</td></tr>
+                <tr><td>0.5</td><td>0.5</td><td>7.63</td><td>0.7925</td><td>5.18</td><td>0.7815</td></tr>
+                <tr><td>0.5</td><td>0.6</td><td>7.60</td><td>0.7905</td><td>5.25</td><td>0.7754</td></tr>
+                <tr><td>0.6</td><td>0.4</td><td><strong>8.06</strong></td><td>0.7483</td><td>5.71</td><td>0.7640</td></tr>
+                <tr class="pj-highlight"><td>0.6</td><td>0.5</td><td>8.05</td><td><strong>0.8913</strong></td><td>5.92</td><td>0.7506</td></tr>
+                <tr><td>0.6</td><td>0.6</td><td>7.98</td><td>0.8772</td><td>5.86</td><td>0.7569</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption><strong>Table 3.</strong> CIMV reduces variance more than the classic lump-sum model in every target setting, and improves IR in all but one. Best ratio 8.06×, best IR 0.8913.</figcaption>
+        </figure>
+
+        <div class="pm-metrics" style="margin-top: 26px;">
+          <div class="pm-metric">
+            <strong>8.06 vs 5.92</strong>
+            <span>best risk-reduction ratio<br>CIMV vs classic</span>
+          </div>
+          <div class="pm-metric">
+            <strong>0.8913 vs 0.7506</strong>
+            <span>best information ratio<br>at the same target</span>
+          </div>
+          <div class="pm-metric">
+            <strong>9 / 9</strong>
+            <span>target settings where CIMV<br>cuts more variance</span>
+          </div>
+          <div class="pm-metric">
+            <strong>8 / 9</strong>
+            <span>target settings where CIMV<br>also lifts IR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PANEL 3: FF49 · m = 10 ============ -->
+      <div class="pm-tab-panel" data-panel="ff49-m10">
+        <div class="pm-subhead">
+          <h3>FF49 · m = 10</h3>
+          <span>Holding density and turnover at matched penalties</span>
+        </div>
+
+        <figure class="pj-figure" style="margin-top: 18px;">
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr>
+                  <th>τ<sub>1</sub></th>
+                  <th>τ<sub>2</sub></th>
+                  <th>CIMV Density</th>
+                  <th>CIMV T</th>
+                  <th>Classic Density</th>
+                  <th>Classic T</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>10<sup>−3</sup></td><td>10<sup>−3</sup></td><td>18.16</td><td>9.75</td><td>20.41</td><td>7.48</td></tr>
+                <tr><td>10<sup>−3</sup></td><td>10<sup>−4</sup></td><td>20.00</td><td>18.82</td><td>20.61</td><td>19.05</td></tr>
+                <tr><td>10<sup>−4</sup></td><td>10<sup>−3</sup></td><td>49.18</td><td>11.79</td><td>42.86</td><td>10.20</td></tr>
+                <tr><td>10<sup>−4</sup></td><td>10<sup>−4</sup></td><td>54.37</td><td>35.37</td><td>50.61</td><td>33.33</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption><strong>Table 4.</strong> At matched parameters the two models have similar holding and trading costs, while CIMV keeps the variance-reduction advantage.</figcaption>
+        </figure>
+
+        <p class="pm-note">
+          Longer horizons compress density in both models; the injection model keeps a modest edge at the tighter penalty setting because the fused term removes redundant, highly correlated sectors.
+        </p>
+      </div>
+
+      <!-- ============ PANEL 4: FF49 · Asset Behaviour ============ -->
+      <div class="pm-tab-panel" data-panel="ff49-evolution">
+        <div class="pm-subhead">
+          <h3>FF49 · Asset Behaviour</h3>
+          <span>Weight paths, sparsity pattern, and concentration at l<sub>s</sub> = l<sub>c</sub> = 0.4</span>
+        </div>
+
+        <div class="pm-fig-row">
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig2-weights.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig2-weights.png' | relative_url }}" width="1499" height="778" loading="eager" decoding="async" alt="Asset weight paths over time with and without capital injections">
+            </a>
+            <figcaption><strong>Figure 2.</strong> Weight paths over time; the right panel adds injections (P). Smooth paths mean low turnover.</figcaption>
+          </figure>
+
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig3-sparsity.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig3-sparsity.png' | relative_url }}" width="583" height="1177" loading="eager" decoding="async" alt="Sparsity pattern of the FF49 allocation across assets and periods">
+            </a>
+            <figcaption><strong>Figure 3.</strong> Sparsity pattern: filled dots are held, hollow circles are the alternative allocation.</figcaption>
+          </figure>
+
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig4-average.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig4-average.png' | relative_url }}" width="800" height="678" loading="eager" decoding="async" alt="Pie chart of average invested amount per asset">
+            </a>
+            <figcaption><strong>Figure 4.</strong> Average amount invested per asset. A handful of sectors absorb most of the book.</figcaption>
+          </figure>
+        </div>
+
+        <p class="pm-note">
+          Click any figure to open the full-size version. Excluded assets tend to be highly positively correlated with the held ones — similar trends, but higher volatility or lower return — which is why dropping them costs little diversification.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="takeaways">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Takeaways</p>
+      <h2>Four things to remember.</h2>
+    </div>
+
+    <ol class="pm-takeaways">
+      <li>
+        <h3>Capital injections cut risk, not just cost</h3>
+        <p>On FF49 the variance-reduction ratio reaches 8.06 against 5.92 for the classic model; on FTSE 100 it never falls below 3.45 across the τ sweep.</p>
+      </li>
+      <li>
+        <h3>Two ℓ<sub>1</sub> terms make the book sparse and stable</h3>
+        <p>Holding density stays between 18% and 54% and turnover drops relative to the naive 1/n book, so both costs are controlled by one tunable pair (τ<sub>1</sub>, τ<sub>2</sub>).</p>
+      </li>
+      <li>
+        <h3>The solver is provably convergent</h3>
+        <p>A two-block prediction–correction ADMM with Cholesky precomputation converges to an optimal solution; the proof shows the merit function decreases monotonically.</p>
+      </li>
+      <li>
+        <h3>Performance holds across targets</h3>
+        <p>IR stays above 0.49 on FTSE 100 and peaks at 0.8913 on FF49, so the risk reduction does not come at the expense of risk-adjusted return.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="pj-section" id="citation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">Citation</p>
+      <h2>BibTeX</h2>
+    </div>
+    <div class="pj-citation-wrap">
+      <button class="pj-copy-btn" type="button" data-copy="#bibtex-cimv">Copy</button>
+<pre class="pj-citation" id="bibtex-cimv">@article{shi2025multi,
+  title   = {Multi-period mean--variance portfolio optimization with capital injections},
+  author  = {Shi, Longyu and Wang, Yunyun and Li, Wenyue and Zhang, Zhimin},
+  journal = {Mathematics and Computers in Simulation},
+  volume  = {233},
+  pages   = {400--412},
+  year    = {2025},
+  doi     = {10.1016/j.matcom.2025.02.006}
+}</pre>
+    </div>
+  </div>
+</section>

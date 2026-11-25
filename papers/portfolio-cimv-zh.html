@@ -1,0 +1,556 @@
+---
+layout: project
+title: "带资金注入的多期均值—方差投资组合优化"
+description: "CIMV 在融合 Lasso 的均值—方差框架下将资金分多期注入，并用可证明收敛的两块 ADMM 求解；相比经典一次性投入模型，组合方差降幅最高达 8.06 倍。"
+permalink: /papers/portfolio-cimv/zh/
+lang: zh-CN
+lang_switch_url: /papers/portfolio-cimv/
+lang_switch_label: Switch to English
+lang_switch_hreflang: en
+extra_css: /assets/css/portfolio.css
+extra_js: /assets/js/portfolio.js
+footer_note: "© 2025 李文月 · Mathematics and Computers in Simulation 233:400–412"
+nav_links:
+  - label: 概览
+    href: "#overview"
+  - label: 方法
+    href: "#approach"
+  - label: 求解流程
+    href: "#howitworks"
+  - label: 实验
+    href: "#experiments"
+  - label: 结果
+    href: "#results"
+  - label: 要点
+    href: "#takeaways"
+  - label: 引用
+    href: "#citation"
+---
+
+<section class="pj-hero" id="overview">
+  <div class="pj-container">
+    <p class="pj-kicker">Mathematics and Computers in Simulation · 2025 · 233:400–412</p>
+    <h1 class="pj-title"><span class="pj-tp">带资金注入的</span><span class="pj-tp">多期均值—方差</span><span class="pj-tp">投资组合优化</span></h1>
+
+    <p class="pj-authors">
+      Longyu Shi<sup>1</sup>, Yunyun Wang<sup>2,3</sup>,
+      <span class="pj-self">李文月</span><sup>1</sup>,
+      <strong>Zhimin Zhang</strong><sup>1,✉</sup>
+    </p>
+    <p class="pj-affil">
+      <sup>1</sup> 重庆大学数学与统计学院 ·
+      <sup>2</sup> 湖南大学金融与统计学院 ·
+      <sup>3</sup> 莫纳什大学计量经济学与商业统计系
+    </p>
+    <p class="pj-notes">✉ 通讯作者。</p>
+
+    <div class="pj-actions">
+      <a class="pj-btn pj-btn-primary" href="https://www.sciencedirect.com/science/article/abs/pii/S0378475425000424" target="_blank" rel="noopener">论文</a>
+      <a class="pj-btn" href="https://doi.org/10.1016/j.matcom.2025.02.006" target="_blank" rel="noopener">DOI</a>
+      <a class="pj-btn" href="#citation">BibTeX</a>
+    </div>
+
+    <figure class="pj-hero-figure">
+      <a class="pj-figure-link" href="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" target="_blank" rel="noopener">
+        <img src="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" width="1800" height="983" loading="eager" decoding="async" alt="CIMV 模型图形摘要：周期性资金注入、融合 Lasso 惩罚、ADMM 求解与实证结果">
+      </a>
+      <figcaption class="pj-caption">
+        <strong>图形摘要。</strong> CIMV 把周期性资金注入、融合 Lasso 惩罚与两块 ADMM 求解器串成一条链路。右栏概括了实证收益：更高的风险下降比、受控的持有与交易成本，以及优于经典模型的信息比率。
+        <a href="{{ '/assets/img/papers/portfolio-cimv/hero-framework.jpg' | relative_url }}" target="_blank" rel="noopener">查看大图 ↗</a>
+      </figcaption>
+    </figure>
+
+    <div class="pj-stats">
+      <div class="pj-stat">
+        <strong>8.06×</strong>
+        <span>风险下降比<br>经典模型为 5.92</span>
+      </div>
+      <div class="pj-stat">
+        <strong>0.8913</strong>
+        <span>最优信息比率<br>同目标下经典模型为 0.7506</span>
+      </div>
+      <div class="pj-stat">
+        <strong>6</strong>
+        <span>调仓期数<br>覆盖 83 只富时 100 成分股</span>
+      </div>
+      <div class="pj-stat">
+        <strong>2</strong>
+        <span>真实数据集<br>富时 100 与 FF49 行业组合</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pj-news-strip">
+  <div class="pj-container pj-news-inner">
+    <span class="pj-news-label">动态</span>
+    <span><strong>2025-02</strong> — 发表于 Mathematics and Computers in Simulation, 233:400–412。</span>
+    <span><strong>2025</strong> — JCR Q1，中科院 2 区。</span>
+  </div>
+</div>
+
+<section class="pj-section" id="abstract">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">摘要</p>
+      <h2>先投一部分，其余分批注入。</h2>
+    </div>
+    <p class="pj-lead">
+      本文研究这样一类投资组合问题：投资者先把一部分资金配置到较大的资产池中，随后在若干期内逐步注入剩余资金。为此提出带资金注入的多期均值—方差模型，用以在这一框架下构造稀疏的长期投资策略。模型采用融合 Lasso，引入两个 ℓ<sub>1</sub> 惩罚项，分别降低持有成本与交易成本；针对由此得到的非光滑、多变量优化问题，采用两块交替方向乘子法求解，并给出完整的收敛性分析。两个真实数据集上的实证结果验证了模型的实际适用性与有效性。
+    </p>
+    <ul class="pm-kw">
+      <li>投资组合优化</li>
+      <li>多期决策</li>
+      <li>资金注入</li>
+      <li>融合 Lasso</li>
+      <li>ADMM</li>
+      <li>稀疏性</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="approach">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">方法</p>
+      <h2>CIMV 概览。</h2>
+    </div>
+    <p class="pj-lead">
+      多数多期模型假设资金一次性投入。这既忽略了定投（dollar-cost averaging）与价值平均（value averaging）这类分批建仓的做法，也忽略了长期持仓中最主要的两类成本：持有与交易。
+    </p>
+
+    <figure class="pj-figure pj-figure-wide" style="margin-top: 26px;">
+      <img src="{{ '/assets/img/papers/portfolio-cimv/framework-card.jpg' | relative_url }}" width="770" height="602" loading="eager" decoding="async" alt="CIMV 模型总览：初始投资、周期性资金注入、融合 Lasso 惩罚项、稀疏组合与 ADMM 求解器">
+      <figcaption>
+        <strong>总览。</strong> 资金分期到位，两个融合 Lasso 惩罚控制持有与交易成本，再由两块 ADMM 求解整个规划。
+      </figcaption>
+    </figure>
+
+    <div class="pj-grid-2" style="margin-top: 28px;">
+      <div class="pj-card">
+        <h3>持有成本</h3>
+        <p class="pj-small">
+          每一只持仓都需要跟踪、披露与资金占用。惩罚 <span class="pj-key">‖w<sub>j</sub>‖<sub>1</sub></span> 会把优化解推向<span class="pj-mark">稀疏</span>组合，使资金集中在少数更易把握的标的上。
+        </p>
+      </div>
+      <div class="pj-card">
+        <h3>交易成本</h3>
+        <p class="pj-small">
+          频繁调仓会反复摩擦账户。惩罚 <span class="pj-key">‖w<sub>j+1</sub> − w<sub>j</sub>‖<sub>1</sub></span> 让权重在相邻期之间保持<span class="pj-mark">稳定</span>，从而降低换手、保留配置意图。
+        </p>
+      </div>
+    </div>
+
+    <p class="pj-lead" style="margin-top: 30px;">
+      记 <span class="pm-var">w</span> 为全部 <span class="pj-key">m</span> 期权重的堆叠，<span class="pm-var">p</span> 为各期注入金额。带资金注入的均值—方差模型（CIMV）的紧凑形式，是一个带两个 ℓ<sub>1</sub> 项与线性财富动态的二次规划。
+    </p>
+
+    <div class="pm-eq">
+      <div class="pm-eq-body">
+        min<sub>w, p</sub> &nbsp; ½ w<sup>⊤</sup>Σw + λ<sub>1</sub>‖w‖<sub>1</sub> + λ<sub>2</sub>‖Fw‖<sub>1</sub>
+        <br>
+        s.t. &nbsp; Ew − p = y<sub>1</sub>, &nbsp; H<sub>1</sub>p = y<sub>2</sub>, &nbsp; p ≥ 0, &nbsp; Gw − H<sub>2</sub>p ≥ w<sub>min</sub>
+      </div>
+      <p class="pm-eq-cap">
+        <strong>论文式 (7)。</strong> Σ 为收益协方差矩阵；F 为一阶差分矩阵，度量相邻两期的权重变化；E、G 编码财富演化；H<sub>1</sub>、H<sub>2</sub> 编码注入预算与最低财富约束。
+      </p>
+    </div>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      点击卡片可翻转查看具体含义。
+    </p>
+
+    <div class="pm-flip-grid">
+      <div class="pm-flip" role="button" tabindex="0" aria-label="翻转查看财富动态">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">1</span> 财富动态</h3>
+            <div class="pm-flip-front-body">1<sub>n</sub>w<sub>1</sub> = ξ<sub>init</sub><br>1<sub>n</sub>w<sub>j</sub> = (1<sub>n</sub> + r<sub>j−1</sub><sup>⊤</sup>)w<sub>j−1</sub> + p<sub>j−1</sub></div>
+            <span class="pm-flip-hint">点击 →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">1</span> 财富动态</h3>
+            <p>
+              初始财富支撑第一期组合；此后每一期以上一期组合的收益加上本期注入 <strong>p<sub>j−1</sub></strong> 作为起点。
+            </p>
+            <span class="pm-flip-hint">← 再点一次</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-flip" role="button" tabindex="0" aria-label="翻转查看持有稀疏">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">2</span> 持有稀疏</h3>
+            <div class="pm-flip-front-body">λ<sub>1</sub> Σ<sub>j=1…m</sub> ‖w<sub>j</sub>‖<sub>1</sub></div>
+            <span class="pm-flip-hint">点击 →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">2</span> 持有稀疏</h3>
+            <p>
+              第一个 ℓ<sub>1</sub> 项压缩持仓数量，使资金集中在更少、更清晰的资产上。
+            </p>
+            <span class="pm-flip-hint">← 再点一次</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-flip" role="button" tabindex="0" aria-label="翻转查看交易稳定">
+        <div class="pm-flip-inner">
+          <div class="pm-flip-face flip-front">
+            <h3><span class="pm-flip-num">3</span> 交易稳定</h3>
+            <div class="pm-flip-front-body">λ<sub>2</sub> Σ<sub>j=1…m−1</sub> ‖w<sub>j+1</sub> − w<sub>j</sub>‖<sub>1</sub></div>
+            <span class="pm-flip-hint">点击 →</span>
+          </div>
+          <div class="pm-flip-face flip-back">
+            <h3><span class="pm-flip-num">3</span> 交易稳定</h3>
+            <p>
+              第二个 ℓ<sub>1</sub> 项惩罚权重漂移，把融合 Lasso 结构直接转化为对换手的控制。
+            </p>
+            <span class="pm-flip-hint">← 再点一次</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="pm-constraints">
+      <li><strong>注入预算。</strong> 资金在前 <code>t</code> 期按无风险利率折现后注入，剩余部分留在无风险资产中。</li>
+      <li><strong>非负约束。</strong> <code>p ≥ 0</code> — 注入是单向的，模型不允许投资期内撤回资金。</li>
+      <li><strong>财富下限。</strong> 每期期望财富需不低于 1/n 朴素策略。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="pj-section" id="howitworks">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">求解流程</p>
+      <h2>可证明收敛的两块 ADMM。</h2>
+    </div>
+    <p class="pj-lead">
+      CIMV 含有五个可分离块。直接多块 ADMM 并不保证收敛，因此采用 He 等人提出的预测—校正格式：先做 Gauss–Seidel 预测，再用参数 ν ∈ (0, 1) 做松弛校正。
+    </p>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      鼠标悬停可放大查看细节——三条更新规则，一次循环。
+    </p>
+
+    <div class="pm-fb-grid">
+      <div class="pm-fb teal" tabindex="0" role="group" aria-label="ADMM Gauss–Seidel 预测步">
+        <div class="pm-fb-label">步骤 1 · ADMM 迭代</div>
+        <div class="pm-fb-title">逐块预测</div>
+        <div class="pm-fb-eq">w̃<sub>k</sub> = D<sub>1</sub>λ<sub>k</sub><br>D<sub>1</sub> = (Σ + βA<sub>1</sub><sup>⊤</sup>A<sub>1</sub>)<sup>−1</sup>A<sub>1</sub><sup>⊤</sup></div>
+        <div class="pm-fb-detail">
+          <strong>w̃</strong> 子问题是一个在迭代中保持不变的线性方程组，用 Cholesky 分解预先求逆即可。其余各块——<strong>p̃</strong>、<strong>ã</strong>、<strong>b̃</strong>、<strong>c̃</strong>——都有闭式近端映射。
+        </div>
+      </div>
+
+      <div class="pm-fb amber" tabindex="0" role="group" aria-label="软阈值近端算子">
+        <div class="pm-fb-label">步骤 2 · 软阈值</div>
+        <div class="pm-fb-title">两个 ℓ<sub>1</sub> 惩罚项共享同一个近端算子</div>
+        <div class="pm-fb-eq">û<sub>i</sub> = sign(v<sub>i</sub>) · max{0, |v<sub>i</sub>| − λ/μ}</div>
+        <div class="pm-fb-detail">
+          所有非光滑部分——持仓惩罚 λ<sub>1</sub>‖w‖<sub>1</sub> 与交易惩罚 λ<sub>2</sub>‖Fw‖<sub>1</sub>——都归约为同一个逐分量的软阈值，计算便宜且精确。
+        </div>
+      </div>
+
+      <div class="pm-fb blue" tabindex="0" role="group" aria-label="松弛校正与收敛性">
+        <div class="pm-fb-label">步骤 3 · 松弛 + 收敛</div>
+        <div class="pm-fb-title">校正并松弛以恢复收缩性质</div>
+        <div class="pm-fb-eq">ξ<sub>k+1</sub> = ξ<sub>k</sub> − N(ξ<sub>k</sub> − ξ̃<sub>k</sub>)</div>
+        <div class="pm-fb-detail">
+          预测值经 ν ∈ (0, 1) 松弛后才进入下一轮迭代。直接多块 ADMM 本身并不收敛，但加上这一步后，价值函数 ‖ξ<sup>k</sup> − ξ*‖<sub>H</sub> 单调下降，序列收敛到最优解点 v*。
+        </div>
+      </div>
+    </div>
+
+    <p class="pm-note">
+      每轮迭代的开销：一次矩阵—向量乘法（w 子问题）、每个 ℓ<sub>1</sub> 块一次软阈值，以及一次平凡的对偶变量 λ 更新——足以处理 83 资产 × 6 期的问题。
+    </p>
+
+    <div class="pm-converge">
+      <span class="pm-converge-tag">命题 A.1</span>
+      <p>
+        <strong>收敛性。</strong> 设 {v<sup>k</sup>} 为算法产生的迭代序列。当 H 与 Q 正定时，价值函数 ‖ξ<sup>k</sup> − ξ*‖<sub>H</sub> 单调下降，且 ‖ξ<sup>k</sup> − ξ̃<sup>k</sup>‖<sub>Q</sub> → 0，故序列收敛到最优解点 v*。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="experiments">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">实验</p>
+      <h2>两个真实数据集，两种投资期限。</h2>
+    </div>
+    <p class="pj-lead">
+      两个数据集均取自 Fama–French 数据库。注入过程从第二期开始，持续到整个投资期后半段；基准始终是把全部可用财富均摊到所有资产上的 1/n 朴素策略。
+    </p>
+
+    <div class="pm-datasets">
+      <div class="pm-dataset">
+        <h3><span class="pm-tag">富时 100</span> 英国大盘指数</h3>
+        <ul class="pm-spec">
+          <li><b>83</b> 只股票</li>
+          <li><b>周频</b> 收益</li>
+          <li><b>2002-07 → 2016-04</b></li>
+          <li><b>m = 6</b> 个季度</li>
+        </ul>
+        <p>检验模型能否在季度调仓下跟踪宽基指数，同时控制持有成本与交易成本。</p>
+      </div>
+      <div class="pm-dataset">
+        <h3><span class="pm-tag">FF49</span> 美国行业组合</h3>
+        <ul class="pm-spec">
+          <li><b>49</b> 个行业</li>
+          <li><b>月频</b> 收益</li>
+          <li><b>30 年</b> 窗口</li>
+          <li><b>m = 5 / 10</b></li>
+        </ul>
+        <p>取最近 30 年数据并采用 5 年滚动窗口，将注入模型 (6) 与一次性投入模型 (5) 直接对比。</p>
+      </div>
+    </div>
+
+    <div class="pm-metrics">
+      <div class="pm-metric">
+        <strong>Ratio</strong>
+        <span>朴素策略风险 ÷ 最优策略风险，大于 1 表示更安全。</span>
+      </div>
+      <div class="pm-metric">
+        <strong>Density</strong>
+        <span>非零权重占比，用于刻画持有成本。</span>
+      </div>
+      <div class="pm-metric">
+        <strong>T</strong>
+        <span>相对朴素策略的权重变动次数，用于刻画交易成本。</span>
+      </div>
+      <div class="pm-metric">
+        <strong>IR</strong>
+        <span>单位超额收益波动对应的平均超额收益。</span>
+      </div>
+    </div>
+
+    <p class="pm-note">
+      参数扫描：τ<sub>1</sub> 在 [10<sup>−5</sup>, 10<sup>−4</sup>] 取 20 个值，τ<sub>2</sub> 在 [10<sup>−4</sup>, 10<sup>−3</sup>] 取 20 个值；财务目标 l<sub>s</sub>, l<sub>c</sub> ∈ {0.3, 0.4, 0.5, 0.6}，并设容忍度 tol<sub>s</sub>、tol<sub>c</sub>。
+    </p>
+  </div>
+</section>
+
+<section class="pj-section" id="results">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">结果</p>
+      <h2>在可控成本下显著降险。</h2>
+    </div>
+
+    <p class="pm-note" style="margin-top: 4px;">
+      切换标签可以横向对比各实验分支；最后一页把四张行为图缩成一行。
+    </p>
+
+    <div class="pm-tabs">
+      <div class="pm-tabs-header">
+        <button class="pm-tab-btn is-active" data-tab="ftse">富时 100</button>
+        <button class="pm-tab-btn" data-tab="ff49-m5">FF49 · m = 5</button>
+        <button class="pm-tab-btn" data-tab="ff49-m10">FF49 · m = 10</button>
+        <button class="pm-tab-btn" data-tab="ff49-evolution">资产行为</button>
+      </div>
+
+      <div class="pm-tab-panel is-active" data-panel="ftse">
+        <div class="pm-subhead">
+          <h3>富时 100</h3>
+          <span>83 只股票 · 六个季度 · 风险下降比始终高于 3.45</span>
+        </div>
+
+        <div class="pm-fig-pair">
+          <figure class="pj-figure">
+            <div class="pj-table-wrap">
+              <table class="pj-table pj-table-sm pj-table-numeric">
+                <thead><tr><th>l<sub>s</sub></th><th>l<sub>c</sub></th><th>τ<sub>1</sub></th><th>τ<sub>2</sub></th><th>IR</th><th>Ratio</th></tr></thead>
+                <tbody>
+                  <tr><td>0.3</td><td>0.3</td><td>1.90E−05</td><td>4.60E−05</td><td>0.6138</td><td><strong>29.69</strong></td></tr>
+                  <tr><td>0.4</td><td>0.4</td><td>1.50E−05</td><td>7.30E−05</td><td>0.8805</td><td><strong>26.63</strong></td></tr>
+                  <tr><td>0.5</td><td>0.5</td><td>7.30E−05</td><td>4.15E−04</td><td>0.4910</td><td><strong>8.51</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption><strong>表 1。</strong> 各目标下风险下降幅度都很大，IR 始终在 0.49 以上。</figcaption>
+          </figure>
+          <figure class="pj-figure">
+            <div class="pj-table-wrap">
+              <table class="pj-table pj-table-sm pj-table-numeric">
+                <thead><tr><th>τ<sub>1</sub></th><th>τ<sub>2</sub></th><th>Density (%)</th><th>T (%)</th><th>Ratio</th></tr></thead>
+                <tbody>
+                  <tr><td>10<sup>−3</sup></td><td>10<sup>−3</sup></td><td>28.92</td><td>4.10</td><td>3.81</td></tr>
+                  <tr><td>10<sup>−3</sup></td><td>10<sup>−4</sup></td><td>29.92</td><td>6.27</td><td>3.83</td></tr>
+                  <tr><td>10<sup>−4</sup></td><td>10<sup>−3</sup></td><td>30.32</td><td>6.99</td><td>3.52</td></tr>
+                  <tr><td>10<sup>−4</sup></td><td>10<sup>−4</sup></td><td>30.12</td><td>7.95</td><td><strong>3.45</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption><strong>表 2。</strong> 惩罚越大，密度与换手越低；风险比从不低于 3.45。</figcaption>
+          </figure>
+        </div>
+
+        <figure class="pj-figure" style="margin-top: 26px;">
+          <div class="pj-table-wrap" style="background: transparent; border: 0;">
+            <img src="{{ '/assets/img/papers/portfolio-cimv/fig1-wealth.png' | relative_url }}" width="1672" height="1411" loading="eager" decoding="async" alt="富时 100 各调仓期财富值">
+          </div>
+          <figcaption><strong>图 1。</strong> (l<sub>s</sub>, l<sub>c</sub>) = (0.3, 0.3)、(0.4, 0.4)、(0.5, 0.5) 时各调仓期财富与朴素策略对比。最优财富（星号）均高于最低财富下限（三角），后期注入更平缓。</figcaption>
+        </figure>
+      </div>
+
+      <div class="pm-tab-panel" data-panel="ff49-m5">
+        <div class="pm-subhead">
+          <h3>FF49 · m = 5</h3>
+          <span>跨目标对比：CIMV vs 一次性投入经典模型</span>
+        </div>
+        <figure class="pj-figure" style="margin-top: 18px;">
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead>
+                <tr><th>l<sub>s</sub></th><th>l<sub>c</sub></th><th>CIMV Ratio</th><th>CIMV IR</th><th>经典模型 Ratio</th><th>经典模型 IR</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0.4</td><td>0.4</td><td>7.23</td><td>0.7215</td><td>5.28</td><td>0.7094</td></tr>
+                <tr><td>0.4</td><td>0.5</td><td>7.21</td><td>0.7384</td><td>4.93</td><td>0.7149</td></tr>
+                <tr><td>0.4</td><td>0.6</td><td>7.21</td><td>0.7384</td><td>4.93</td><td>0.7149</td></tr>
+                <tr><td>0.5</td><td>0.4</td><td>7.78</td><td>0.7266</td><td>5.56</td><td>0.7232</td></tr>
+                <tr><td>0.5</td><td>0.5</td><td>7.63</td><td>0.7925</td><td>5.18</td><td>0.7815</td></tr>
+                <tr><td>0.5</td><td>0.6</td><td>7.60</td><td>0.7905</td><td>5.25</td><td>0.7754</td></tr>
+                <tr><td>0.6</td><td>0.4</td><td><strong>8.06</strong></td><td>0.7483</td><td>5.71</td><td>0.7640</td></tr>
+                <tr class="pj-highlight"><td>0.6</td><td>0.5</td><td>8.05</td><td><strong>0.8913</strong></td><td>5.92</td><td>0.7506</td></tr>
+                <tr><td>0.6</td><td>0.6</td><td>7.98</td><td>0.8772</td><td>5.86</td><td>0.7569</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption><strong>表 3。</strong> 所有目标下 CIMV 方差降幅均大于经典模型，除一处外 IR 也更优。最佳 Ratio 8.06×，最佳 IR 0.8913。</figcaption>
+        </figure>
+
+        <div class="pm-metrics" style="margin-top: 26px;">
+          <div class="pm-metric">
+            <strong>8.06 vs 5.92</strong>
+            <span>最佳风险下降比<br>CIMV vs 经典模型</span>
+          </div>
+          <div class="pm-metric">
+            <strong>0.8913 vs 0.7506</strong>
+            <span>最佳信息比率<br>同一目标下对比</span>
+          </div>
+          <div class="pm-metric">
+            <strong>9 / 9</strong>
+            <span>所有目标设置中<br>CIMV 降险更多</span>
+          </div>
+          <div class="pm-metric">
+            <strong>8 / 9</strong>
+            <span>同时提升 IR 的<br>目标设置数</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pm-tab-panel" data-panel="ff49-m10">
+        <div class="pm-subhead">
+          <h3>FF49 · m = 10</h3>
+          <span>相同惩罚参数下的持有密度与换手率</span>
+        </div>
+        <figure class="pj-figure" style="margin-top: 18px;">
+          <div class="pj-table-wrap">
+            <table class="pj-table pj-table-numeric">
+              <thead><tr><th>τ<sub>1</sub></th><th>τ<sub>2</sub></th><th>CIMV Density</th><th>CIMV T</th><th>经典 Density</th><th>经典 T</th></tr></thead>
+              <tbody>
+                <tr><td>10<sup>−3</sup></td><td>10<sup>−3</sup></td><td>18.16</td><td>9.75</td><td>20.41</td><td>7.48</td></tr>
+                <tr><td>10<sup>−3</sup></td><td>10<sup>−4</sup></td><td>20.00</td><td>18.82</td><td>20.61</td><td>19.05</td></tr>
+                <tr><td>10<sup>−4</sup></td><td>10<sup>−3</sup></td><td>49.18</td><td>11.79</td><td>42.86</td><td>10.20</td></tr>
+                <tr><td>10<sup>−4</sup></td><td>10<sup>−4</sup></td><td>54.37</td><td>35.37</td><td>50.61</td><td>33.33</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption><strong>表 4。</strong> 参数相同时两模型持有与交易成本相近，而 CIMV 保持了方差下降优势。</figcaption>
+        </figure>
+        <p class="pm-note">
+          期限越长，两个模型的密度都会被压低；在更紧的惩罚设置下，注入模型因为融合项剔除了冗余的高度相关行业，仍保有小幅优势。
+        </p>
+      </div>
+
+      <div class="pm-tab-panel" data-panel="ff49-evolution">
+        <div class="pm-subhead">
+          <h3>FF49 · 资产行为</h3>
+          <span>l<sub>s</sub> = l<sub>c</sub> = 0.4 时的权重路径、稀疏模式与集中度</span>
+        </div>
+
+        <div class="pm-fig-row">
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig2-weights.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig2-weights.png' | relative_url }}" width="1499" height="778" loading="eager" decoding="async" alt="FF49 资产权重随时间的变化，含与不含资金注入">
+            </a>
+            <figcaption><strong>图 2。</strong> 权重路径随时间变化；右图带资金注入（P）。曲线平滑说明换手较低。</figcaption>
+          </figure>
+
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig3-sparsity.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig3-sparsity.png' | relative_url }}" width="583" height="1177" loading="eager" decoding="async" alt="FF49 投资组合在资产与期数上的稀疏模式">
+            </a>
+            <figcaption><strong>图 3。</strong> 稀疏模式：实心点为实际持有，空心圆为另一种配置的选择。</figcaption>
+          </figure>
+
+          <figure class="pm-fig-tile">
+            <a href="{{ '/assets/img/papers/portfolio-cimv/fig4-average.png' | relative_url }}" target="_blank" rel="noopener">
+              <img src="{{ '/assets/img/papers/portfolio-cimv/fig4-average.png' | relative_url }}" width="800" height="678" loading="eager" decoding="async" alt="FF49 各资产平均投入金额饼图">
+            </a>
+            <figcaption><strong>图 4。</strong> 各资产平均投入占比。少数行业吸收了大部分资金。</figcaption>
+          </figure>
+        </div>
+
+        <p class="pm-note">
+          点击任意图片可查看原图。被排除的资产往往与持仓资产高度正相关——走势相近，但波动更高或收益更低，因此剔除它们几乎不损失分散化效果。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pj-section" id="takeaways">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">要点</p>
+      <h2>四句话总结。</h2>
+    </div>
+
+    <ol class="pm-takeaways">
+      <li>
+        <h3>资金注入降低的不只是成本，还有风险</h3>
+        <p>FF49 上风险下降比达到 8.06，经典模型为 5.92；富时 100 上在整个 τ 扫描范围内都不低于 3.45。</p>
+      </li>
+      <li>
+        <h3>两个 ℓ<sub>1</sub> 项让组合既稀疏又稳定</h3>
+        <p>持有密度维持在 18%–54%，换手相对 1/n 朴素组合下降，两类成本由同一对参数 (τ<sub>1</sub>, τ<sub>2</sub>) 统一调节。</p>
+      </li>
+      <li>
+        <h3>求解器可证明收敛</h3>
+        <p>带 Cholesky 预计算的两块预测—校正 ADMM 收敛到最优解；证明给出价值函数单调下降的结论。</p>
+      </li>
+      <li>
+        <h3>不同目标下表现稳健</h3>
+        <p>富时 100 上 IR 始终高于 0.49，FF49 上最高达 0.8913，说明降险并未牺牲风险调整后收益。</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="pj-section" id="citation">
+  <div class="pj-container">
+    <div class="pj-section-head">
+      <p class="pj-eyebrow">引用</p>
+      <h2>BibTeX</h2>
+    </div>
+    <div class="pj-citation-wrap">
+      <button class="pj-copy-btn" type="button" data-copy="#bibtex-cimv">复制</button>
+<pre class="pj-citation" id="bibtex-cimv">@article{shi2025multi,
+  title   = {Multi-period mean--variance portfolio optimization with capital injections},
+  author  = {Shi, Longyu and Wang, Yunyun and Li, Wenyue and Zhang, Zhimin},
+  journal = {Mathematics and Computers in Simulation},
+  volume  = {233},
+  pages   = {400--412},
+  year    = {2025},
+  doi     = {10.1016/j.matcom.2025.02.006}
+}</pre>
+    </div>
+  </div>
+</section>
